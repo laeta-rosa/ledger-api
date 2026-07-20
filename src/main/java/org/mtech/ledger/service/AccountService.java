@@ -15,8 +15,8 @@ public class AccountService {
 
     private final AccountRepository accounts;
 
-    public Account createAccount() {
-        return accounts.save(Account.open());
+    public Account createAccount(String name, String surname) {
+        return accounts.save(Account.open(name, surname));
     }
 
     public BigDecimal getBalance(UUID accountId) {

@@ -26,7 +26,7 @@ class TransactionServiceTest {
 
     @BeforeEach
     void setUp() {
-        accountId = accounts.createAccount().getId();
+        accountId = accounts.createAccount("Ada", "Lovelace").getId();
     }
 
     @Test
@@ -82,7 +82,7 @@ class TransactionServiceTest {
 
     @Test
     void historyIsScopedToOneAccount() {
-        var other = accounts.createAccount().getId();
+        var other = accounts.createAccount("Ada", "Lovelace").getId();
         transactions.record(accountId, TransactionType.DEPOSIT, new BigDecimal("5.00"));
 
         assertThat(transactions.getHistory(other)).isEmpty();

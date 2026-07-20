@@ -4,6 +4,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.Matchers.equalTo;
 
 import io.restassured.RestAssured;
+import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.web.server.LocalServerPort;
@@ -27,6 +28,8 @@ abstract class AbstractControllerIntegrationTest {
     /** Creates an account and returns its id, asserting the 201 + zero starting balance. */
     protected String createAccount() {
         return given()
+                .contentType(ContentType.JSON)
+                .body("{\"name\":\"Ada\",\"surname\":\"Lovelace\"}")
                 .when()
                 .post("/accounts")
                 .then()

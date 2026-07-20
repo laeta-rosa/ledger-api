@@ -20,7 +20,46 @@ class AccountControllerIntegrationTest extends AbstractControllerIntegrationTest
                 .then()
                 .statusCode(200)
                 .body("id", equalTo(accountId))
+                .body("name", equalTo("Ada"))
+                .body("surname", equalTo("Lovelace"))
                 .body("balance", equalTo(0.00f));
+    }
+
+    @Test
+    void createReturnsAccountHolderName() {
+        given()
+                .contentType(ContentType.JSON)
+                .body("{\"name\":\"Grace\",\"surname\":\"Hopper\"}")
+                .when()
+                .post("/accounts")
+                .then()
+                .statusCode(201)
+                .body("name", equalTo("Grace"))
+                .body("surname", equalTo("Hopper"));
+    }
+
+    @Test
+    void overlongNameIsRejected() {
+        var tooLong = "A".repeat(101);
+
+        given()
+                .contentType(ContentType.JSON)
+                .body("{\"name\":\"" + tooLong + "\",\"surname\":\"Hopper\"}")
+                .when()
+                .post("/accounts")
+                .then()
+                .statusCode(400);
+    }
+
+    @Test
+    void blankNameIsRejected() {
+        given()
+                .contentType(ContentType.JSON)
+                .body("{\"name\":\"\",\"surname\":\"Hopper\"}")
+                .when()
+                .post("/accounts")
+                .then()
+                .statusCode(400);
     }
 
     @Test

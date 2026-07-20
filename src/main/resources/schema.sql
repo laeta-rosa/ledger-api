@@ -1,5 +1,7 @@
 CREATE TABLE IF NOT EXISTS account (
     id      UUID PRIMARY KEY,
+    name    VARCHAR(100)   NOT NULL,
+    surname VARCHAR(100)   NOT NULL,
     balance DECIMAL(19, 2) NOT NULL,
     version BIGINT
 );

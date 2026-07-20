@@ -17,7 +17,7 @@ class AccountServiceTest {
 
     @Test
     void newAccountHasZeroBalance() {
-        var account = accounts.createAccount();
+        var account = accounts.createAccount("Ada", "Lovelace");
 
         assertThat(accounts.getBalance(account.getId())).isEqualByComparingTo("0.00");
     }

@@ -12,7 +12,7 @@ class TransactionTypeTest {
 
     @Test
     void depositAddsToBalance() {
-        var account = Account.open();
+        var account = Account.open("Ada", "Lovelace");
 
         TransactionType.DEPOSIT.apply(account, new BigDecimal("40.00"));
 
@@ -21,7 +21,7 @@ class TransactionTypeTest {
 
     @Test
     void withdrawalSubtractsFromBalance() {
-        var account = Account.open();
+        var account = Account.open("Ada", "Lovelace");
         TransactionType.DEPOSIT.apply(account, new BigDecimal("40.00"));
 
         TransactionType.WITHDRAWAL.apply(account, new BigDecimal("15.00"));
@@ -31,7 +31,7 @@ class TransactionTypeTest {
 
     @Test
     void withdrawalBeyondBalanceIsRejected() {
-        var account = Account.open();
+        var account = Account.open("Ada", "Lovelace");
         TransactionType.DEPOSIT.apply(account, new BigDecimal("10.00"));
 
         assertThatThrownBy(() -> TransactionType.WITHDRAWAL.apply(account, new BigDecimal("15.00")))

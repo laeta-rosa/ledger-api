@@ -22,13 +22,17 @@ public class Account {
     @Id
     private final UUID id;
 
+    private final String name;
+
+    private final String surname;
+
     private BigDecimal balance;
 
     @Version
     private Long version;
 
-    public static Account open() {
-        return new Account(UUID.randomUUID(), new BigDecimal("0.00"), null);
+    public static Account open(String name, String surname) {
+        return new Account(UUID.randomUUID(), name, surname, new BigDecimal("0.00"), null);
     }
 
     public void deposit(BigDecimal amount) {

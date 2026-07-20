@@ -35,7 +35,6 @@ public class AmountValidator implements ConstraintValidator<ValidAmount, BigDeci
         if (stripped.scale() > MAX_FRACTION_DIGITS) {
             return "must have at most 2 decimal places";
         }
-        // precision - scale is the number of digits left of the decimal point.
         if (stripped.precision() - stripped.scale() > MAX_INTEGER_DIGITS) {
             return "must have at most 12 integer digits";
         }
