@@ -5,6 +5,8 @@ import static org.hamcrest.Matchers.equalTo;
 
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.mtech.ledger.api.transaction.TransactionController;
 
 /** HTTP tests for {@link TransactionController}: recording movements and history. */
@@ -84,13 +86,14 @@ class TransactionControllerIntegrationTest extends AbstractControllerIntegration
                 .statusCode(422);
     }
 
-    @Test
-    void invalidAmountReturns400() {
+    @ParameterizedTest
+    @ValueSource(strings = {"-5.00", "0", "1.005"})
+    void invalidAmountReturns400(String amount) {
         var accountId = createAccount();
 
         given()
                 .contentType(ContentType.JSON)
-                .body("{\"amount\":-5.00}")
+                .body("{\"amount\":" + amount + "}")
                 .when()
                 .post("/accounts/{id}/deposit", accountId)
                 .then()

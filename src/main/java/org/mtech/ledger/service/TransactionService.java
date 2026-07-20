@@ -27,7 +27,6 @@ public class TransactionService {
      */
     @Transactional
     public Transaction record(UUID accountId, TransactionType transactionType, BigDecimal amount) {
-        validateAmount(amount);
         var account = accounts.getAccount(accountId);
         var normalized = amount.setScale(2);
 
@@ -45,14 +44,5 @@ public class TransactionService {
     public List<Transaction> getHistory(UUID accountId) {
         accounts.getAccount(accountId);
         return transactions.findByAccountIdOrderByTimestampDesc(accountId);
-    }
-
-    private void validateAmount(BigDecimal amount) {
-        if (amount == null || amount.signum() <= 0) {
-            throw new IllegalArgumentException("Amount must be a positive number");
-        }
-        if (amount.stripTrailingZeros().scale() > 2) {
-            throw new IllegalArgumentException("Amount cannot have more than 2 decimal places");
-        }
     }
 }

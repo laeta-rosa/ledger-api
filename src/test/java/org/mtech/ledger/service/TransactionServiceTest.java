@@ -56,23 +56,6 @@ class TransactionServiceTest {
     }
 
     @Test
-    void zeroOrNegativeAmountIsRejected() {
-        assertThatThrownBy(() ->
-                transactions.record(accountId, TransactionType.DEPOSIT, BigDecimal.ZERO))
-                .isInstanceOf(IllegalArgumentException.class);
-        assertThatThrownBy(() ->
-                transactions.record(accountId, TransactionType.DEPOSIT, new BigDecimal("-5.00")))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
-    void amountWithMoreThanTwoDecimalPlacesIsRejected() {
-        assertThatThrownBy(() ->
-                transactions.record(accountId, TransactionType.DEPOSIT, new BigDecimal("1.005")))
-                .isInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
     void unknownAccountIsRejected() {
         var unknown = UUID.randomUUID();
 
