@@ -1,5 +1,6 @@
 package org.mtech.ledger.api.transaction;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
@@ -18,17 +19,20 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/accounts/{id}")
 @RequiredArgsConstructor
+@Tag(name = "Transactions", description = "Deposit, withdraw, and view transaction history")
 public class TransactionController {
 
     private final TransactionService transactions;
 
     @GetMapping("/transactions")
+    @Swagger.GetHistory.Description
     public List<TransactionResponse> getHistory(@PathVariable UUID id) {
         return transactions.getHistory(id).stream().map(TransactionResponse::from).toList();
     }
 
     @PostMapping("/deposit")
     @ResponseStatus(HttpStatus.CREATED)
+    @Swagger.Deposit.Description
     public TransactionResponse deposit(
             @PathVariable UUID id, @Valid @RequestBody CreateTransactionRequest request) {
         var transaction = transactions.record(id, TransactionType.DEPOSIT, request.amount());
@@ -37,6 +41,7 @@ public class TransactionController {
 
     @PostMapping("/withdrawal")
     @ResponseStatus(HttpStatus.CREATED)
+    @Swagger.Withdraw.Description
     public TransactionResponse withdraw(
             @PathVariable UUID id, @Valid @RequestBody CreateTransactionRequest request) {
         var transaction = transactions.record(id, TransactionType.WITHDRAWAL, request.amount());

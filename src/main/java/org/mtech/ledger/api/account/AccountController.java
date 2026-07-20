@@ -1,5 +1,6 @@
 package org.mtech.ledger.api.account;
 
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
@@ -16,18 +17,21 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/accounts")
 @RequiredArgsConstructor
+@Tag(name = "Accounts", description = "Create accounts and query their balance")
 public class AccountController {
 
     private final AccountService accounts;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @Swagger.CreateAccount.Description
     public AccountResponse createAccount(@Valid @RequestBody CreateAccountRequest request) {
         var account = accounts.createAccount(request.name(), request.surname());
         return AccountResponse.from(account);
     }
 
     @GetMapping("/{id}/balance")
+    @Swagger.GetBalance.Description
     public AccountResponse getBalance(@PathVariable UUID id) {
         return AccountResponse.from(accounts.getAccount(id));
     }
