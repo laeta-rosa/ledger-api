@@ -31,7 +31,7 @@ class AccountControllerIntegrationTest extends AbstractControllerIntegrationTest
                 .contentType(ContentType.JSON)
                 .body("{\"amount\":100.00}")
                 .when()
-                .post("/accounts/{id}/transactions/deposits", accountId)
+                .post("/accounts/{id}/deposit", accountId)
                 .then()
                 .statusCode(201);
 
@@ -39,7 +39,7 @@ class AccountControllerIntegrationTest extends AbstractControllerIntegrationTest
                 .contentType(ContentType.JSON)
                 .body("{\"amount\":30.00}")
                 .when()
-                .post("/accounts/{id}/transactions/withdrawals", accountId)
+                .post("/accounts/{id}/withdrawal", accountId)
                 .then()
                 .statusCode(201);
 

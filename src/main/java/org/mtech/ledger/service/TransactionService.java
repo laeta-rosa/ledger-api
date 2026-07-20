@@ -26,26 +26,24 @@ public class TransactionService {
      * overdraft can never slip through a race.
      */
     @Transactional
-    public Transaction record(UUID accountId, TransactionType type, BigDecimal amount) {
+    public Transaction record(UUID accountId, TransactionType transactionType, BigDecimal amount) {
         validateAmount(amount);
         var account = accounts.getAccount(accountId);
         var normalized = amount.setScale(2);
 
-        switch (type) {
-            case DEPOSIT -> account.deposit(normalized);
-            case WITHDRAWAL -> account.withdraw(normalized);
-        }
+        transactionType.apply(account, normalized);
+
         accounts.save(account);
 
         var transaction = new Transaction(
-                UUID.randomUUID(), accountId, type, normalized, Instant.now(), account.getBalance());
+                UUID.randomUUID(), accountId, transactionType, normalized, Instant.now(), account.getBalance());
         return transactions.save(transaction);
     }
 
     /** Returns the account's transactions, newest first. */
     @Transactional(readOnly = true)
     public List<Transaction> getHistory(UUID accountId) {
-        accounts.getAccount(accountId); // throws 404 if the account is unknown
+        accounts.getAccount(accountId);
         return transactions.findByAccountIdOrderByTimestampDesc(accountId);
     }
 
