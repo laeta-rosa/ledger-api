@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.mtech.ledger.domain.Account;
 import org.mtech.ledger.domain.Transaction;
 import org.mtech.ledger.domain.TransactionType;
@@ -13,15 +14,11 @@ import org.springframework.transaction.annotation.Transactional;
 
 /** Money movements: recording deposits/withdrawals and reading history. */
 @Service
+@RequiredArgsConstructor
 public class TransactionService {
 
     private final AccountService accounts;
     private final TransactionRepository transactions;
-
-    public TransactionService(AccountService accounts, TransactionRepository transactions) {
-        this.accounts = accounts;
-        this.transactions = transactions;
-    }
 
     /**
      * Records a deposit or withdrawal atomically: the balance update and the

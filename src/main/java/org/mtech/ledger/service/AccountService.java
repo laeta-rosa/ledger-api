@@ -2,6 +2,7 @@ package org.mtech.ledger.service;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.mtech.ledger.domain.Account;
 import org.mtech.ledger.domain.AccountNotFoundException;
 import org.mtech.ledger.repository.AccountRepository;
@@ -9,13 +10,10 @@ import org.springframework.stereotype.Service;
 
 /** Account lifecycle: opening accounts and reading their state. */
 @Service
+@RequiredArgsConstructor
 public class AccountService {
 
     private final AccountRepository accounts;
-
-    public AccountService(AccountRepository accounts) {
-        this.accounts = accounts;
-    }
 
     public Account createAccount() {
         return accounts.save(Account.open());

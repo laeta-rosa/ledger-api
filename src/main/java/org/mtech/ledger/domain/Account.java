@@ -2,6 +2,8 @@ package org.mtech.ledger.domain;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
@@ -13,6 +15,8 @@ import org.springframework.data.relational.core.mapping.Table;
  * distinguish a freshly opened account (null version) from a persisted one.
  */
 @Table("account")
+@Getter
+@AllArgsConstructor
 public class Account {
 
     @Id
@@ -22,12 +26,6 @@ public class Account {
 
     @Version
     private Long version;
-
-    public Account(UUID id, BigDecimal balance, Long version) {
-        this.id = id;
-        this.balance = balance;
-        this.version = version;
-    }
 
     public static Account open() {
         return new Account(UUID.randomUUID(), new BigDecimal("0.00"), null);
@@ -43,17 +41,5 @@ public class Account {
             throw new InsufficientFundsException(this.balance, amount);
         }
         this.balance = newBalance;
-    }
-
-    public UUID getId() {
-        return id;
-    }
-
-    public BigDecimal getBalance() {
-        return balance;
-    }
-
-    public Long getVersion() {
-        return version;
     }
 }

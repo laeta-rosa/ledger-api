@@ -3,6 +3,7 @@ package org.mtech.ledger.api;
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
+import lombok.RequiredArgsConstructor;
 import org.mtech.ledger.domain.Transaction;
 import org.mtech.ledger.service.TransactionService;
 import org.springframework.http.HttpStatus;
@@ -16,13 +17,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 @RestController
 @RequestMapping("/accounts/{id}/transactions")
+@RequiredArgsConstructor
 public class TransactionController {
 
     private final TransactionService transactions;
-
-    public TransactionController(TransactionService transactions) {
-        this.transactions = transactions;
-    }
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
