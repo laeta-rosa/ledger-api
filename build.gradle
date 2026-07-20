@@ -1,6 +1,8 @@
+import org.springframework.boot.gradle.plugin.SpringBootPlugin
+
 plugins {
     id 'java'
-    id 'org.springframework.boot' version '4.0.7'
+    alias(libs.plugins.spring.boot)
 }
 
 group = 'org.mtech'
@@ -8,7 +10,7 @@ version = '1.0-SNAPSHOT'
 
 java {
     toolchain {
-        languageVersion = JavaLanguageVersion.of(21)
+        languageVersion = JavaLanguageVersion.of(25)
     }
 }
 
@@ -17,21 +19,14 @@ repositories {
 }
 
 dependencies {
-    implementation platform(org.springframework.boot.gradle.plugin.SpringBootPlugin.BOM_COORDINATES)
-    implementation 'org.springframework.boot:spring-boot-starter-web'
-    implementation 'org.springframework.boot:spring-boot-starter-validation'
-    implementation 'org.springframework.boot:spring-boot-starter-data-jdbc'
-    runtimeOnly 'com.h2database:h2'
-    compileOnly 'org.projectlombok:lombok:1.18.38'
-    annotationProcessor 'org.projectlombok:lombok:1.18.38'
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation 'io.rest-assured:rest-assured:6.0.1'
-    testCompileOnly 'org.projectlombok:lombok:1.18.38'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.38'
-}
-
-tasks.withType(JavaCompile).configureEach {
-    options.compilerArgs += ['-Xlint:deprecation', '-parameters']
+    implementation platform(SpringBootPlugin.BOM_COORDINATES)
+    implementation libs.bundles.spring
+    runtimeOnly libs.database.h2
+    compileOnly libs.processor.lombok
+    annotationProcessor libs.processor.lombok
+    testImplementation libs.bundles.test
+    testCompileOnly libs.processor.lombok
+    testAnnotationProcessor libs.processor.lombok
 }
 
 test {

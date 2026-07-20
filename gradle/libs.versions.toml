@@ -1,0 +1,32 @@
+[versions]
+plugin-spring-boot = "4.0.7"
+
+library-lombok = "1.18.46"
+library-rest-assured = "6.0.1"
+
+[plugins]
+spring-boot = { id = "org.springframework.boot", version.ref = "plugin-spring-boot" }
+
+[libraries]
+processor-lombok = { group = "org.projectlombok", name = "lombok", version.ref = "library-lombok" }
+
+database-starter-data-jdbc = { group = "org.springframework.boot", name = "spring-boot-starter-data-jdbc" }
+database-h2 = { group = "com.h2database", name = "h2" }
+
+spring-boot-starter-web = { group = "org.springframework.boot", name = "spring-boot-starter-web" }
+spring-boot-starter-validation = { group = "org.springframework.boot", name = "spring-boot-starter-validation" }
+
+test-spring-boot-starter-test = { group = "org.springframework.boot", name = "spring-boot-starter-test" }
+test-rest-assured = { group = "io.rest-assured", name = "rest-assured", version.ref = "library-rest-assured" }
+
+[bundles]
+spring = [
+    "spring-boot-starter-web",
+    "spring-boot-starter-validation",
+    "database-starter-data-jdbc"
+]
+
+test = [
+    "test-spring-boot-starter-test",
+    "test-rest-assured"
+]
