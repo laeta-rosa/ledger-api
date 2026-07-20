@@ -2,7 +2,6 @@ package org.mtech.ledger.api.account;
 
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.mtech.ledger.domain.account.Account;
 import org.mtech.ledger.service.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -22,7 +21,7 @@ public class AccountController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public AccountResponse createAccount() {
-        Account account = accounts.createAccount();
+        var account = accounts.createAccount();
         return new AccountResponse(account.getId(), account.getBalance());
     }
 

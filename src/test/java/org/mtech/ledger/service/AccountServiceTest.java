@@ -5,7 +5,6 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
-import org.mtech.ledger.domain.account.Account;
 import org.mtech.ledger.domain.account.AccountNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -18,14 +17,14 @@ class AccountServiceTest {
 
     @Test
     void newAccountHasZeroBalance() {
-        Account account = accounts.createAccount();
+        var account = accounts.createAccount();
 
         assertThat(accounts.getBalance(account.getId())).isEqualByComparingTo("0.00");
     }
 
     @Test
     void unknownAccountIsRejected() {
-        UUID unknown = UUID.randomUUID();
+        var unknown = UUID.randomUUID();
 
         assertThatThrownBy(() -> accounts.getBalance(unknown))
                 .isInstanceOf(AccountNotFoundException.class);

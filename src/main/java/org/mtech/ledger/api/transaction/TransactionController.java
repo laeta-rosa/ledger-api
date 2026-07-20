@@ -4,7 +4,7 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.mtech.ledger.domain.transaction.Transaction;
+import org.mtech.ledger.domain.transaction.TransactionType;
 import org.mtech.ledger.service.TransactionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -16,22 +16,30 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/accounts/{id}/transactions")
+@RequestMapping("/accounts/{id}")
 @RequiredArgsConstructor
 public class TransactionController {
 
     private final TransactionService transactions;
 
-    @PostMapping
+    @GetMapping("/transactions")
+    public List<TransactionResponse> getHistory(@PathVariable UUID id) {
+        return transactions.getHistory(id).stream().map(TransactionResponse::from).toList();
+    }
+
+    @PostMapping("/deposit")
     @ResponseStatus(HttpStatus.CREATED)
-    public TransactionResponse recordTransaction(
+    public TransactionResponse deposit(
             @PathVariable UUID id, @Valid @RequestBody CreateTransactionRequest request) {
-        Transaction transaction = transactions.record(id, request.type(), request.amount());
+        var transaction = transactions.record(id, TransactionType.DEPOSIT, request.amount());
         return TransactionResponse.from(transaction);
     }
 
-    @GetMapping
-    public List<TransactionResponse> getHistory(@PathVariable UUID id) {
-        return transactions.getHistory(id).stream().map(TransactionResponse::from).toList();
+    @PostMapping("/withdrawal")
+    @ResponseStatus(HttpStatus.CREATED)
+    public TransactionResponse withdraw(
+            @PathVariable UUID id, @Valid @RequestBody CreateTransactionRequest request) {
+        var transaction = transactions.record(id, TransactionType.WITHDRAWAL, request.amount());
+        return TransactionResponse.from(transaction);
     }
 }

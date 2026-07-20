@@ -36,7 +36,7 @@ public class Account {
     }
 
     public void withdraw(BigDecimal amount) {
-        BigDecimal newBalance = this.balance.subtract(amount);
+        var newBalance = this.balance.subtract(amount);
         if (newBalance.signum() < 0) {
             throw new InsufficientFundsException(this.balance, amount);
         }

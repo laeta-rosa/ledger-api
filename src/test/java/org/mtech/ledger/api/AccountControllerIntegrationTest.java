@@ -12,7 +12,7 @@ class AccountControllerIntegrationTest extends AbstractControllerIntegrationTest
 
     @Test
     void newAccountStartsWithZeroBalance() {
-        String accountId = createAccount();
+        var accountId = createAccount();
 
         given()
                 .when()
@@ -25,21 +25,21 @@ class AccountControllerIntegrationTest extends AbstractControllerIntegrationTest
 
     @Test
     void balanceReflectsRecordedMovements() {
-        String accountId = createAccount();
+        var accountId = createAccount();
 
         given()
                 .contentType(ContentType.JSON)
-                .body("{\"type\":\"DEPOSIT\",\"amount\":100.00}")
+                .body("{\"amount\":100.00}")
                 .when()
-                .post("/accounts/{id}/transactions", accountId)
+                .post("/accounts/{id}/transactions/deposits", accountId)
                 .then()
                 .statusCode(201);
 
         given()
                 .contentType(ContentType.JSON)
-                .body("{\"type\":\"WITHDRAWAL\",\"amount\":30.00}")
+                .body("{\"amount\":30.00}")
                 .when()
-                .post("/accounts/{id}/transactions", accountId)
+                .post("/accounts/{id}/transactions/withdrawals", accountId)
                 .then()
                 .statusCode(201);
 

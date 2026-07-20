@@ -4,13 +4,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mtech.ledger.domain.account.AccountNotFoundException;
 import org.mtech.ledger.domain.account.InsufficientFundsException;
-import org.mtech.ledger.domain.transaction.Transaction;
 import org.mtech.ledger.domain.transaction.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,7 +31,7 @@ class TransactionServiceTest {
 
     @Test
     void depositIncreasesBalance() {
-        Transaction tx = transactions.record(accountId, TransactionType.DEPOSIT, new BigDecimal("100.50"));
+        var tx = transactions.record(accountId, TransactionType.DEPOSIT, new BigDecimal("100.50"));
 
         assertThat(tx.balanceAfter()).isEqualByComparingTo("100.50");
         assertThat(accounts.getBalance(accountId)).isEqualByComparingTo("100.50");
@@ -76,7 +74,7 @@ class TransactionServiceTest {
 
     @Test
     void unknownAccountIsRejected() {
-        UUID unknown = UUID.randomUUID();
+        var unknown = UUID.randomUUID();
 
         assertThatThrownBy(() ->
                 transactions.record(unknown, TransactionType.DEPOSIT, new BigDecimal("1.00")))
@@ -90,7 +88,7 @@ class TransactionServiceTest {
         transactions.record(accountId, TransactionType.DEPOSIT, new BigDecimal("100.00"));
         transactions.record(accountId, TransactionType.WITHDRAWAL, new BigDecimal("40.00"));
 
-        List<Transaction> history = transactions.getHistory(accountId);
+        var history = transactions.getHistory(accountId);
 
         assertThat(history).hasSize(2);
         assertThat(history.get(0).type()).isEqualTo(TransactionType.WITHDRAWAL);
@@ -101,7 +99,7 @@ class TransactionServiceTest {
 
     @Test
     void historyIsScopedToOneAccount() {
-        UUID other = accounts.createAccount().getId();
+        var other = accounts.createAccount().getId();
         transactions.record(accountId, TransactionType.DEPOSIT, new BigDecimal("5.00"));
 
         assertThat(transactions.getHistory(other)).isEmpty();

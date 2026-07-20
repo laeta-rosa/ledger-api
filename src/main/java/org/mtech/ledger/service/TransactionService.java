@@ -5,7 +5,6 @@ import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.mtech.ledger.domain.account.Account;
 import org.mtech.ledger.domain.transaction.Transaction;
 import org.mtech.ledger.domain.transaction.TransactionType;
 import org.mtech.ledger.repository.TransactionRepository;
@@ -29,8 +28,8 @@ public class TransactionService {
     @Transactional
     public Transaction record(UUID accountId, TransactionType type, BigDecimal amount) {
         validateAmount(amount);
-        Account account = accounts.getAccount(accountId);
-        BigDecimal normalized = amount.setScale(2);
+        var account = accounts.getAccount(accountId);
+        var normalized = amount.setScale(2);
 
         switch (type) {
             case DEPOSIT -> account.deposit(normalized);
@@ -38,7 +37,7 @@ public class TransactionService {
         }
         accounts.save(account);
 
-        Transaction transaction = new Transaction(
+        var transaction = new Transaction(
                 UUID.randomUUID(), accountId, type, normalized, Instant.now(), account.getBalance());
         return transactions.save(transaction);
     }

@@ -10,25 +10,35 @@ import org.mtech.ledger.api.transaction.TransactionController;
 /** HTTP tests for {@link TransactionController}: recording movements and history. */
 class TransactionControllerIntegrationTest extends AbstractControllerIntegrationTest {
 
-    private void record(String accountId, String type, String amount) {
+    private void deposit(String accountId, String amount) {
         given()
                 .contentType(ContentType.JSON)
-                .body("{\"type\":\"" + type + "\",\"amount\":" + amount + "}")
+                .body("{\"amount\":" + amount + "}")
                 .when()
-                .post("/accounts/{id}/transactions", accountId)
+                .post("/accounts/{id}/deposit", accountId)
+                .then()
+                .statusCode(201);
+    }
+
+    private void withdraw(String accountId, String amount) {
+        given()
+                .contentType(ContentType.JSON)
+                .body("{\"amount\":" + amount + "}")
+                .when()
+                .post("/accounts/{id}/withdrawal", accountId)
                 .then()
                 .statusCode(201);
     }
 
     @Test
     void recordsDepositAndWithdrawalWithRunningBalance() {
-        String accountId = createAccount();
+        var accountId = createAccount();
 
         given()
                 .contentType(ContentType.JSON)
-                .body("{\"type\":\"DEPOSIT\",\"amount\":100.00}")
+                .body("{\"amount\":100.00}")
                 .when()
-                .post("/accounts/{id}/transactions", accountId)
+                .post("/accounts/{id}/deposit", accountId)
                 .then()
                 .statusCode(201)
                 .body("type", equalTo("DEPOSIT"))
@@ -36,19 +46,20 @@ class TransactionControllerIntegrationTest extends AbstractControllerIntegration
 
         given()
                 .contentType(ContentType.JSON)
-                .body("{\"type\":\"WITHDRAWAL\",\"amount\":30.00}")
+                .body("{\"amount\":30.00}")
                 .when()
-                .post("/accounts/{id}/transactions", accountId)
+                .post("/accounts/{id}/withdrawal", accountId)
                 .then()
                 .statusCode(201)
+                .body("type", equalTo("WITHDRAWAL"))
                 .body("balanceAfter", equalTo(70.00f));
     }
 
     @Test
     void historyIsNewestFirst() {
-        String accountId = createAccount();
-        record(accountId, "DEPOSIT", "100.00");
-        record(accountId, "WITHDRAWAL", "30.00");
+        var accountId = createAccount();
+        deposit(accountId, "100.00");
+        withdraw(accountId, "30.00");
 
         given()
                 .when()
@@ -62,39 +73,26 @@ class TransactionControllerIntegrationTest extends AbstractControllerIntegration
 
     @Test
     void overdraftReturns422() {
-        String accountId = createAccount();
+        var accountId = createAccount();
 
         given()
                 .contentType(ContentType.JSON)
-                .body("{\"type\":\"WITHDRAWAL\",\"amount\":1.00}")
+                .body("{\"amount\":1.00}")
                 .when()
-                .post("/accounts/{id}/transactions", accountId)
+                .post("/accounts/{id}/withdrawal", accountId)
                 .then()
                 .statusCode(422);
     }
 
     @Test
     void invalidAmountReturns400() {
-        String accountId = createAccount();
+        var accountId = createAccount();
 
         given()
                 .contentType(ContentType.JSON)
-                .body("{\"type\":\"DEPOSIT\",\"amount\":-5.00}")
+                .body("{\"amount\":-5.00}")
                 .when()
-                .post("/accounts/{id}/transactions", accountId)
-                .then()
-                .statusCode(400);
-    }
-
-    @Test
-    void invalidTypeReturns400() {
-        String accountId = createAccount();
-
-        given()
-                .contentType(ContentType.JSON)
-                .body("{\"type\":\"TRANSFER\",\"amount\":5.00}")
-                .when()
-                .post("/accounts/{id}/transactions", accountId)
+                .post("/accounts/{id}/deposit", accountId)
                 .then()
                 .statusCode(400);
     }
@@ -103,9 +101,9 @@ class TransactionControllerIntegrationTest extends AbstractControllerIntegration
     void unknownAccountReturns404() {
         given()
                 .contentType(ContentType.JSON)
-                .body("{\"type\":\"DEPOSIT\",\"amount\":10.00}")
+                .body("{\"amount\":10.00}")
                 .when()
-                .post("/accounts/{id}/transactions", "00000000-0000-0000-0000-000000000000")
+                .post("/accounts/{id}/deposit", "00000000-0000-0000-0000-000000000000")
                 .then()
                 .statusCode(404);
     }

@@ -28,7 +28,8 @@ Run the tests with:
 |---|---|---|
 | `POST` | `/accounts` | Create a new account (starts with a 0.00 balance) |
 | `GET` | `/accounts/{id}/balance` | Current balance |
-| `POST` | `/accounts/{id}/transactions` | Record a deposit or withdrawal |
+| `POST` | `/accounts/{id}/transactions/deposits` | Record a deposit |
+| `POST` | `/accounts/{id}/transactions/withdrawals` | Record a withdrawal |
 | `GET` | `/accounts/{id}/transactions` | Transaction history, newest first |
 
 ### Examples
@@ -43,18 +44,18 @@ curl -s -X POST localhost:8080/accounts
 Deposit 100.00 (use the `id` returned above):
 
 ```bash
-curl -s -X POST localhost:8080/accounts/<id>/transactions \
+curl -s -X POST localhost:8080/accounts/<id>/transactions/deposits \
   -H 'Content-Type: application/json' \
-  -d '{"type": "DEPOSIT", "amount": 100.00}'
+  -d '{"amount": 100.00}'
 # {"id":"...","type":"DEPOSIT","amount":100.00,"timestamp":"...","balanceAfter":100.00}
 ```
 
 Withdraw 30.00:
 
 ```bash
-curl -s -X POST localhost:8080/accounts/<id>/transactions \
+curl -s -X POST localhost:8080/accounts/<id>/transactions/withdrawals \
   -H 'Content-Type: application/json' \
-  -d '{"type": "WITHDRAWAL", "amount": 30.00}'
+  -d '{"amount": 30.00}'
 ```
 
 Check the balance:
@@ -75,7 +76,7 @@ curl -s localhost:8080/accounts/<id>/transactions
 Errors are returned as RFC 9457 `application/problem+json` bodies:
 
 - `404` — unknown account
-- `400` — invalid request (missing/negative/zero amount, more than 2 decimal places, unknown transaction type, malformed body)
+- `400` — invalid request (missing/negative/zero amount, more than 2 decimal places, malformed body)
 - `422` — withdrawal exceeding the current balance
 - `409` — the account was modified concurrently (optimistic-lock conflict); retry the request
 
