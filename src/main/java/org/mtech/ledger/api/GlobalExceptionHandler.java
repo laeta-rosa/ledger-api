@@ -3,6 +3,7 @@ package org.mtech.ledger.api;
 import java.util.stream.Collectors;
 import org.mtech.ledger.domain.AccountNotFoundException;
 import org.mtech.ledger.domain.InsufficientFundsException;
+import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;
 import org.springframework.http.converter.HttpMessageNotReadableException;
@@ -26,6 +27,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(IllegalArgumentException.class)
     public ProblemDetail handleIllegalArgument(IllegalArgumentException ex) {
         return ProblemDetail.forStatusAndDetail(HttpStatus.BAD_REQUEST, ex.getMessage());
+    }
+
+    @ExceptionHandler(OptimisticLockingFailureException.class)
+    public ProblemDetail handleConcurrentModification(OptimisticLockingFailureException ex) {
+        return ProblemDetail.forStatusAndDetail(
+                HttpStatus.CONFLICT, "The account was modified concurrently. Please retry.");
     }
 
     @ExceptionHandler(MethodArgumentNotValidException.class)

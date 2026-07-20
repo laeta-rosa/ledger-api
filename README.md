@@ -2,7 +2,7 @@
 
 A small REST API powering a simple ledger: record deposits and withdrawals, view the current balance, and view transaction history.
 
-Built with **Java 21** and **Spring Boot 4**, storing everything in memory — no database or other software to install.
+Built with **Java 21** and **Spring Boot 4**, persisting to an **in-memory H2 database** via **Spring Data JDBC** — no database server or other software to install.
 
 ## Requirements
 
@@ -77,21 +77,30 @@ Errors are returned as RFC 9457 `application/problem+json` bodies:
 - `404` — unknown account
 - `400` — invalid request (missing/negative/zero amount, more than 2 decimal places, unknown transaction type, malformed body)
 - `422` — withdrawal exceeding the current balance
+- `409` — the account was modified concurrently (optimistic-lock conflict); retry the request
+
+### Inspecting the database
+
+The H2 web console is enabled at `http://localhost:8080/h2-console` while the app is running. Connect with JDBC URL `jdbc:h2:mem:ledger`, user `sa`, no password, to browse the `account` and `account_transaction` tables.
 
 ## Design
 
 Standard three-layer Spring Boot service, kept deliberately small:
 
-- `api/` — REST controller, request/response records, and an exception handler that maps domain errors to problem-detail responses.
-- `service/` — `LedgerService` holds the business rules: amounts must be positive with at most 2 decimal places, and withdrawals cannot overdraw the account. Each recorded transaction stores the resulting balance (`balanceAfter`), so history doubles as an audit trail.
-- `repository/` — `InMemoryAccountRepository`, a `ConcurrentHashMap` of accounts.
-- `domain/` — `Account`, immutable `Transaction` record, and domain exceptions.
+- `api/` — REST controllers (`AccountController` for account lifecycle + balance, `TransactionController` for money movements + history), request/response records, and an exception handler that maps domain errors to problem-detail responses. Persistence types are never returned directly; the controllers map them to `AccountResponse` / `TransactionResponse` DTOs.
+- `service/` — split by resource, mirroring the controllers: `AccountService` (open accounts, read balance, the shared account lookup) and `TransactionService` (record movements, read history). `TransactionService.record(...)` is `@Transactional`, so the balance update and the appended transaction commit together; it builds on `AccountService` to load and persist the account. Amount validation (positive, at most 2 decimal places) lives in `TransactionService`.
+- `repository/` — Spring Data JDBC `CrudRepository` interfaces: `AccountRepository` and `TransactionRepository` (with a derived `findByAccountIdOrderByTimestampDesc` query).
+- `domain/` — `Account` (the aggregate root; the no-overdraft invariant lives in `Account.withdraw`), the immutable `Transaction` record (a separate, append-only aggregate referencing its account by id), and domain exceptions.
+
+Data access uses **Spring Data JDBC** rather than JPA/Hibernate: no lazy loading or persistence context to reason about, and the immutable `Transaction` stays a plain record. The schema is defined in `src/main/resources/schema.sql` and applied to the in-memory H2 database at startup.
+
+**Concurrency.** `Account` carries an optimistic-lock `@Version`. Two concurrent movements on the same account can't both commit against a stale balance — the loser gets an `OptimisticLockingFailureException` (surfaced as `409`), so an overdraft can never slip through a race even though the assignment doesn't require atomic operations.
 
 ## Assumptions
 
 - **Single currency.** Amounts are decimal numbers with at most 2 decimal places (e.g. `10.50`); no currency field.
 - **No overdrafts.** A withdrawal larger than the current balance is rejected with `422`.
 - **Multiple accounts** are supported (`POST /accounts`); the spec only asks for one ledger, but scoping by account id keeps the API realistic at little extra cost.
-- **In-memory storage.** All data is lost when the application stops.
-- **Thread safety** for balance updates is handled with a per-account lock so the balance and history stay consistent under concurrent requests, even though the spec does not require atomic operations.
-- Out of scope, per the assignment: authentication/authorisation, logging/monitoring, persistence, pagination, and idempotency keys (natural next steps if this grew up).
+- **In-memory storage.** Data lives in an in-memory H2 database and is lost when the application stops. Swapping to a persistent database is a one-line change to the JDBC URL (plus running the schema against it) — no code changes.
+- **Concurrent movements** on the same account are guarded by optimistic locking; a conflicting request receives `409` and can be retried.
+- Out of scope, per the assignment: authentication/authorisation, logging/monitoring, pagination, and idempotency keys (natural next steps if this grew up).

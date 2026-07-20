@@ -1,18 +1,48 @@
 package org.mtech.ledger.domain;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.UUID;
+import org.springframework.data.annotation.Id;
+import org.springframework.data.annotation.Version;
+import org.springframework.data.relational.core.mapping.Table;
 
+/**
+ * Aggregate root for a ledger account. The current balance is the single
+ * invariant this aggregate protects, so the balance-changing rules live here.
+ * The {@code version} field drives optimistic locking and lets Spring Data JDBC
+ * distinguish a freshly opened account (null version) from a persisted one.
+ */
+@Table("account")
 public class Account {
 
+    @Id
     private final UUID id;
-    private BigDecimal balance = new BigDecimal("0.00");
-    private final List<Transaction> history = new ArrayList<>();
 
-    public Account(UUID id) {
+    private BigDecimal balance;
+
+    @Version
+    private Long version;
+
+    public Account(UUID id, BigDecimal balance, Long version) {
         this.id = id;
+        this.balance = balance;
+        this.version = version;
+    }
+
+    public static Account open() {
+        return new Account(UUID.randomUUID(), new BigDecimal("0.00"), null);
+    }
+
+    public void deposit(BigDecimal amount) {
+        this.balance = this.balance.add(amount);
+    }
+
+    public void withdraw(BigDecimal amount) {
+        BigDecimal newBalance = this.balance.subtract(amount);
+        if (newBalance.signum() < 0) {
+            throw new InsufficientFundsException(this.balance, amount);
+        }
+        this.balance = newBalance;
     }
 
     public UUID getId() {
@@ -23,13 +53,7 @@ public class Account {
         return balance;
     }
 
-    public List<Transaction> getHistory() {
-        return history;
-    }
-
-    /** Applies a transaction: sets the new balance and appends it to the history. */
-    public void commit(Transaction transaction) {
-        this.balance = transaction.balanceAfter();
-        this.history.add(transaction);
+    public Long getVersion() {
+        return version;
     }
 }
