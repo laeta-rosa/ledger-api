@@ -1,8 +1,8 @@
-package org.mtech.ledger.api;
+package org.mtech.ledger.api.account;
 
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.mtech.ledger.domain.Account;
+import org.mtech.ledger.domain.account.Account;
 import org.mtech.ledger.service.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;

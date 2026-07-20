@@ -1,10 +1,10 @@
-package org.mtech.ledger.api;
+package org.mtech.ledger.api.transaction;
 
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.UUID;
-import org.mtech.ledger.domain.Transaction;
-import org.mtech.ledger.domain.TransactionType;
+import org.mtech.ledger.domain.transaction.Transaction;
+import org.mtech.ledger.domain.transaction.TransactionType;
 
 public record TransactionResponse(
         UUID id,

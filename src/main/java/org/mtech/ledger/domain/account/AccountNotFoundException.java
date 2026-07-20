@@ -1,4 +1,4 @@
-package org.mtech.ledger.domain;
+package org.mtech.ledger.domain.account;
 
 import java.util.UUID;
 

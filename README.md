@@ -96,6 +96,8 @@ Data access uses **Spring Data JDBC** rather than JPA/Hibernate: no lazy loading
 
 **Concurrency.** `Account` carries an optimistic-lock `@Version`. Two concurrent movements on the same account can't both commit against a stale balance — the loser gets an `OptimisticLockingFailureException` (surfaced as `409`), so an overdraft can never slip through a race even though the assignment doesn't require atomic operations.
 
+**Testing.** Two layers, no mocks. The service tests (`AccountServiceTest`, `TransactionServiceTest`) run against the real `@Service` beans and the in-memory H2 database. The API tests boot the full application on a random port (`@SpringBootTest(webEnvironment = RANDOM_PORT)`) and exercise it over real HTTP with **REST Assured** — actual requests through the servlet stack, JSON serialization, and status codes, not a mocked dispatcher. They mirror the controller split: `AccountControllerIntegrationTest` (creation, balance) and `TransactionControllerIntegrationTest` (recording movements, history, error statuses), sharing setup through `AbstractControllerIntegrationTest`.
+
 ## Assumptions
 
 - **Single currency.** Amounts are decimal numbers with at most 2 decimal places (e.g. `10.50`); no currency field.

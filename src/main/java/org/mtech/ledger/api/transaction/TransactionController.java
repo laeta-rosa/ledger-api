@@ -1,10 +1,10 @@
-package org.mtech.ledger.api;
+package org.mtech.ledger.api.transaction;
 
 import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.mtech.ledger.domain.Transaction;
+import org.mtech.ledger.domain.transaction.Transaction;
 import org.mtech.ledger.service.TransactionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;

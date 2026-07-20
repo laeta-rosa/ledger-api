@@ -1,4 +1,4 @@
-package org.mtech.ledger.api;
+package org.mtech.ledger.api.account;
 
 import java.math.BigDecimal;
 import java.util.UUID;

@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mtech.ledger.domain.AccountNotFoundException;
-import org.mtech.ledger.domain.InsufficientFundsException;
-import org.mtech.ledger.domain.Transaction;
-import org.mtech.ledger.domain.TransactionType;
+import org.mtech.ledger.domain.account.AccountNotFoundException;
+import org.mtech.ledger.domain.account.InsufficientFundsException;
+import org.mtech.ledger.domain.transaction.Transaction;
+import org.mtech.ledger.domain.transaction.TransactionType;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 

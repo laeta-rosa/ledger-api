@@ -5,8 +5,8 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.util.UUID;
 import org.junit.jupiter.api.Test;
-import org.mtech.ledger.domain.Account;
-import org.mtech.ledger.domain.AccountNotFoundException;
+import org.mtech.ledger.domain.account.Account;
+import org.mtech.ledger.domain.account.AccountNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 

@@ -1,10 +1,10 @@
-package org.mtech.ledger.api;
+package org.mtech.ledger.api.transaction;
 
 import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Positive;
 import java.math.BigDecimal;
-import org.mtech.ledger.domain.TransactionType;
+import org.mtech.ledger.domain.transaction.TransactionType;
 
 public record CreateTransactionRequest(
         @NotNull TransactionType type,

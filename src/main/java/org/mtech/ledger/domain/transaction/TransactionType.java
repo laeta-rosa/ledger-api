@@ -1,4 +1,4 @@
-package org.mtech.ledger.domain;
+package org.mtech.ledger.domain.transaction;
 
 public enum TransactionType {
     DEPOSIT,

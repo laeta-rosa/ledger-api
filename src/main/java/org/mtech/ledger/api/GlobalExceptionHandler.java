@@ -1,8 +1,8 @@
 package org.mtech.ledger.api;
 
 import java.util.stream.Collectors;
-import org.mtech.ledger.domain.AccountNotFoundException;
-import org.mtech.ledger.domain.InsufficientFundsException;
+import org.mtech.ledger.domain.account.AccountNotFoundException;
+import org.mtech.ledger.domain.account.InsufficientFundsException;
 import org.springframework.dao.OptimisticLockingFailureException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ProblemDetail;

@@ -3,8 +3,8 @@ package org.mtech.ledger.service;
 import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
-import org.mtech.ledger.domain.Account;
-import org.mtech.ledger.domain.AccountNotFoundException;
+import org.mtech.ledger.domain.account.Account;
+import org.mtech.ledger.domain.account.AccountNotFoundException;
 import org.mtech.ledger.repository.AccountRepository;
 import org.springframework.stereotype.Service;
 

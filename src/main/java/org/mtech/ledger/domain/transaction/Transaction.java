@@ -1,4 +1,4 @@
-package org.mtech.ledger.domain;
+package org.mtech.ledger.domain.transaction;
 
 import java.math.BigDecimal;
 import java.time.Instant;
