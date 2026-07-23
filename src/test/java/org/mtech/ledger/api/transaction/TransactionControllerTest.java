@@ -1,10 +1,8 @@
 package org.mtech.ledger.api.transaction;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import io.restassured.http.ContentType;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -21,22 +19,12 @@ class TransactionControllerTest extends AbstractControllerTest {
     void recordsDepositAndWithdrawalWithRunningBalance() {
         var accountId = createAccount();
 
-        given()
-                .contentType(ContentType.JSON)
-                .body("{\"amount\":100.00}")
-                .when()
-                .post("/accounts/{id}/deposit", accountId)
-                .then()
+        rest.post("/accounts/{id}/deposit", "{\"amount\":100.00}", accountId)
                 .statusCode(201)
                 .body("type", equalTo("DEPOSIT"))
                 .body("balanceAfter", equalTo(100.00f));
 
-        given()
-                .contentType(ContentType.JSON)
-                .body("{\"amount\":30.00}")
-                .when()
-                .post("/accounts/{id}/withdrawal", accountId)
-                .then()
+        rest.post("/accounts/{id}/withdrawal", "{\"amount\":30.00}", accountId)
                 .statusCode(201)
                 .body("type", equalTo("WITHDRAWAL"))
                 .body("balanceAfter", equalTo(70.00f));
@@ -54,10 +42,7 @@ class TransactionControllerTest extends AbstractControllerTest {
         deposit(accountId, "100.00");
         withdraw(accountId, "30.00");
 
-        given()
-                .when()
-                .get("/accounts/{id}/transactions", accountId)
-                .then()
+        rest.get("/accounts/{id}/transactions", accountId)
                 .statusCode(200)
                 .body("size()", equalTo(2))
                 .body("[0].type", equalTo("WITHDRAWAL"))
@@ -72,12 +57,7 @@ class TransactionControllerTest extends AbstractControllerTest {
     void overdraftReturns422() {
         var accountId = createAccount();
 
-        given()
-                .contentType(ContentType.JSON)
-                .body("{\"amount\":1.00}")
-                .when()
-                .post("/accounts/{id}/withdrawal", accountId)
-                .then()
+        rest.post("/accounts/{id}/withdrawal", "{\"amount\":1.00}", accountId)
                 .statusCode(422);
 
         assertThat(db.transactionsOf(accountId)).isEmpty();
@@ -89,12 +69,7 @@ class TransactionControllerTest extends AbstractControllerTest {
     void invalidAmountReturns400(String amount) {
         var accountId = createAccount();
 
-        given()
-                .contentType(ContentType.JSON)
-                .body("{\"amount\":" + amount + "}")
-                .when()
-                .post("/accounts/{id}/deposit", accountId)
-                .then()
+        rest.post("/accounts/{id}/deposit", "{\"amount\":" + amount + "}", accountId)
                 .statusCode(400);
 
         assertThat(db.transactionsOf(accountId)).isEmpty();
@@ -105,34 +80,19 @@ class TransactionControllerTest extends AbstractControllerTest {
     void unknownAccountReturns404() {
         var unknownAccountId = "00000000-0000-0000-0000-000000000000";
 
-        given()
-                .contentType(ContentType.JSON)
-                .body("{\"amount\":10.00}")
-                .when()
-                .post("/accounts/{id}/deposit", unknownAccountId)
-                .then()
+        rest.post("/accounts/{id}/deposit", "{\"amount\":10.00}", unknownAccountId)
                 .statusCode(404);
 
         assertThat(db.transactionsOf(unknownAccountId)).isEmpty();
     }
 
     private void deposit(String accountId, String amount) {
-        given()
-                .contentType(ContentType.JSON)
-                .body("{\"amount\":" + amount + "}")
-                .when()
-                .post("/accounts/{id}/deposit", accountId)
-                .then()
+        rest.post("/accounts/{id}/deposit", "{\"amount\":" + amount + "}", accountId)
                 .statusCode(201);
     }
 
     private void withdraw(String accountId, String amount) {
-        given()
-                .contentType(ContentType.JSON)
-                .body("{\"amount\":" + amount + "}")
-                .when()
-                .post("/accounts/{id}/withdrawal", accountId)
-                .then()
+        rest.post("/accounts/{id}/withdrawal", "{\"amount\":" + amount + "}", accountId)
                 .statusCode(201);
     }
 }

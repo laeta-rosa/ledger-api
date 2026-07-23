@@ -1,10 +1,8 @@
 package org.mtech.ledger.api.account;
 
-import static io.restassured.RestAssured.given;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
-import io.restassured.http.ContentType;
 import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
 import org.mtech.ledger.api.AbstractControllerTest;
@@ -19,10 +17,7 @@ class AccountControllerTest extends AbstractControllerTest {
     void newAccountStartsWithZeroBalance() {
         var accountId = createAccount();
 
-        given()
-                .when()
-                .get("/accounts/{id}/balance", accountId)
-                .then()
+        rest.get("/accounts/{id}/balance", accountId)
                 .statusCode(200)
                 .body("id", equalTo(accountId))
                 .body("name", equalTo("Ada"))
@@ -35,12 +30,7 @@ class AccountControllerTest extends AbstractControllerTest {
 
     @Test
     void createReturnsAccountHolderName() {
-        String accountId = given()
-                .contentType(ContentType.JSON)
-                .body("{\"name\":\"Grace\",\"surname\":\"Hopper\"}")
-                .when()
-                .post("/accounts")
-                .then()
+        String accountId = rest.post("/accounts", "{\"name\":\"Grace\",\"surname\":\"Hopper\"}")
                 .statusCode(201)
                 .body("name", equalTo("Grace"))
                 .body("surname", equalTo("Hopper"))
@@ -55,12 +45,7 @@ class AccountControllerTest extends AbstractControllerTest {
     void overlongNameIsRejected() {
         var tooLong = "A".repeat(101);
 
-        given()
-                .contentType(ContentType.JSON)
-                .body("{\"name\":\"" + tooLong + "\",\"surname\":\"Hopper\"}")
-                .when()
-                .post("/accounts")
-                .then()
+        rest.post("/accounts", "{\"name\":\"" + tooLong + "\",\"surname\":\"Hopper\"}")
                 .statusCode(400);
 
         assertThat(db.accountCount()).isZero();
@@ -70,12 +55,7 @@ class AccountControllerTest extends AbstractControllerTest {
     void maxLengthNameIsAccepted() {
         var maxName = "A".repeat(100);
 
-        String accountId = given()
-                .contentType(ContentType.JSON)
-                .body("{\"name\":\"" + maxName + "\",\"surname\":\"Hopper\"}")
-                .when()
-                .post("/accounts")
-                .then()
+        String accountId = rest.post("/accounts", "{\"name\":\"" + maxName + "\",\"surname\":\"Hopper\"}")
                 .statusCode(201)
                 .extract()
                 .path("id");
@@ -86,12 +66,7 @@ class AccountControllerTest extends AbstractControllerTest {
 
     @Test
     void blankNameIsRejected() {
-        given()
-                .contentType(ContentType.JSON)
-                .body("{\"name\":\"\",\"surname\":\"Hopper\"}")
-                .when()
-                .post("/accounts")
-                .then()
+        rest.post("/accounts", "{\"name\":\"\",\"surname\":\"Hopper\"}")
                 .statusCode(400);
 
         assertThat(db.accountCount()).isZero();
@@ -101,26 +76,13 @@ class AccountControllerTest extends AbstractControllerTest {
     void balanceReflectsRecordedMovements() {
         var accountId = createAccount();
 
-        given()
-                .contentType(ContentType.JSON)
-                .body("{\"amount\":100.00}")
-                .when()
-                .post("/accounts/{id}/deposit", accountId)
-                .then()
+        rest.post("/accounts/{id}/deposit", "{\"amount\":100.00}", accountId)
                 .statusCode(201);
 
-        given()
-                .contentType(ContentType.JSON)
-                .body("{\"amount\":30.00}")
-                .when()
-                .post("/accounts/{id}/withdrawal", accountId)
-                .then()
+        rest.post("/accounts/{id}/withdrawal", "{\"amount\":30.00}", accountId)
                 .statusCode(201);
 
-        given()
-                .when()
-                .get("/accounts/{id}/balance", accountId)
-                .then()
+        rest.get("/accounts/{id}/balance", accountId)
                 .statusCode(200)
                 .body("balance", equalTo(70.00f));
 
@@ -129,10 +91,7 @@ class AccountControllerTest extends AbstractControllerTest {
 
     @Test
     void unknownAccountReturns404() {
-        given()
-                .when()
-                .get("/accounts/{id}/balance", "00000000-0000-0000-0000-000000000000")
-                .then()
+        rest.get("/accounts/{id}/balance", "00000000-0000-0000-0000-000000000000")
                 .statusCode(404);
     }
 }
