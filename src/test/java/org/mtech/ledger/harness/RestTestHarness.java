@@ -4,6 +4,7 @@ import static io.restassured.RestAssured.given;
 import static io.restassured.http.ContentType.JSON;
 
 import io.restassured.response.ValidatableResponse;
+import org.mtech.ledger.fixture.TestMessage;
 import org.springframework.stereotype.Component;
 
 /**
@@ -18,6 +19,11 @@ public class RestTestHarness {
                 .when()
                 .get(path, pathParams)
                 .then();
+    }
+
+    /** POST {@code body}'s JSON to {@code path}, substituting {@code pathParams}. */
+    public ValidatableResponse post(String path, TestMessage body, Object... pathParams) {
+        return post(path, body.asJson(), pathParams);
     }
 
     /** POST {@code body} as JSON to {@code path}, substituting {@code pathParams}. */
