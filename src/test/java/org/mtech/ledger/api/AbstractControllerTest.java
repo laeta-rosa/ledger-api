@@ -6,19 +6,17 @@ import static org.hamcrest.Matchers.equalTo;
 import io.restassured.RestAssured;
 import io.restassured.http.ContentType;
 import org.junit.jupiter.api.BeforeEach;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mtech.ledger.harness.DatabaseTestHarness;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.web.server.LocalServerPort;
 
-/**
- * Boots the full application on a random port and drives it over real HTTP with
- * REST Assured. Shared setup and the {@code createAccount} helper live here so the
- * per-controller test classes stay focused on their own endpoints.
- */
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
-abstract class AbstractControllerIntegrationTest {
+public abstract class AbstractControllerTest {
 
     @LocalServerPort
     private int port;
+
+    @Autowired
+    protected DatabaseTestHarness db;
 
     @BeforeEach
     void configureRestAssured() {

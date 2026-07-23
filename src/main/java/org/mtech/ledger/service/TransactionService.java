@@ -1,6 +1,7 @@
 package org.mtech.ledger.service;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
@@ -28,7 +29,7 @@ public class TransactionService {
     @Transactional
     public Transaction record(UUID accountId, TransactionType transactionType, BigDecimal amount) {
         var account = accounts.getAccount(accountId);
-        var normalized = amount.setScale(2);
+        var normalized = amount.setScale(2, RoundingMode.UNNECESSARY);
 
         transactionType.apply(account, normalized);
 
@@ -43,6 +44,6 @@ public class TransactionService {
     @Transactional(readOnly = true)
     public List<Transaction> getHistory(UUID accountId) {
         accounts.getAccount(accountId);
-        return transactions.findByAccountIdOrderByTimestampDesc(accountId);
+        return transactions.findByAccountIdOrderByTimestampDescIdDesc(accountId);
     }
 }

@@ -1,14 +1,19 @@
-package org.mtech.ledger.api;
+package org.mtech.ledger.api.account;
 
 import static io.restassured.RestAssured.given;
+import static org.assertj.core.api.Assertions.assertThat;
 import static org.hamcrest.Matchers.equalTo;
 
 import io.restassured.http.ContentType;
+import java.math.BigDecimal;
 import org.junit.jupiter.api.Test;
-import org.mtech.ledger.api.account.AccountController;
+import org.mtech.ledger.api.AbstractControllerTest;
+import org.mtech.ledger.harness.DatabaseTestHarness.AccountRow;
+import org.mtech.ledger.meta.IntegrationTest;
 
 /** HTTP tests for {@link AccountController}: account creation and balance. */
-class AccountControllerIntegrationTest extends AbstractControllerIntegrationTest {
+@IntegrationTest
+class AccountControllerTest extends AbstractControllerTest {
 
     @Test
     void newAccountStartsWithZeroBalance() {
@@ -23,11 +28,14 @@ class AccountControllerIntegrationTest extends AbstractControllerIntegrationTest
                 .body("name", equalTo("Ada"))
                 .body("surname", equalTo("Lovelace"))
                 .body("balance", equalTo(0.00f));
+
+        assertThat(db.accountOf(accountId))
+                .isEqualTo(new AccountRow("Ada", "Lovelace", new BigDecimal("0.00")));
     }
 
     @Test
     void createReturnsAccountHolderName() {
-        given()
+        String accountId = given()
                 .contentType(ContentType.JSON)
                 .body("{\"name\":\"Grace\",\"surname\":\"Hopper\"}")
                 .when()
@@ -35,7 +43,12 @@ class AccountControllerIntegrationTest extends AbstractControllerIntegrationTest
                 .then()
                 .statusCode(201)
                 .body("name", equalTo("Grace"))
-                .body("surname", equalTo("Hopper"));
+                .body("surname", equalTo("Hopper"))
+                .extract()
+                .path("id");
+
+        assertThat(db.accountOf(accountId))
+                .isEqualTo(new AccountRow("Grace", "Hopper", new BigDecimal("0.00")));
     }
 
     @Test
@@ -49,6 +62,26 @@ class AccountControllerIntegrationTest extends AbstractControllerIntegrationTest
                 .post("/accounts")
                 .then()
                 .statusCode(400);
+
+        assertThat(db.accountCount()).isZero();
+    }
+
+    @Test
+    void maxLengthNameIsAccepted() {
+        var maxName = "A".repeat(100);
+
+        String accountId = given()
+                .contentType(ContentType.JSON)
+                .body("{\"name\":\"" + maxName + "\",\"surname\":\"Hopper\"}")
+                .when()
+                .post("/accounts")
+                .then()
+                .statusCode(201)
+                .extract()
+                .path("id");
+
+        assertThat(db.accountOf(accountId))
+                .isEqualTo(new AccountRow(maxName, "Hopper", new BigDecimal("0.00")));
     }
 
     @Test
@@ -60,6 +93,8 @@ class AccountControllerIntegrationTest extends AbstractControllerIntegrationTest
                 .post("/accounts")
                 .then()
                 .statusCode(400);
+
+        assertThat(db.accountCount()).isZero();
     }
 
     @Test
@@ -88,6 +123,8 @@ class AccountControllerIntegrationTest extends AbstractControllerIntegrationTest
                 .then()
                 .statusCode(200)
                 .body("balance", equalTo(70.00f));
+
+        assertThat(db.balanceOf(accountId)).isEqualByComparingTo("70.00");
     }
 
     @Test

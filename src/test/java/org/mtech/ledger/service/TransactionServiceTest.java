@@ -5,22 +5,22 @@ import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
 import java.util.UUID;
+
+import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mtech.ledger.domain.account.AccountNotFoundException;
 import org.mtech.ledger.domain.account.InsufficientFundsException;
 import org.mtech.ledger.domain.transaction.TransactionType;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.mtech.ledger.meta.IntegrationTest;
 
-@SpringBootTest
+@IntegrationTest
+@RequiredArgsConstructor
 class TransactionServiceTest {
 
-    @Autowired
-    private AccountService accounts;
+    private final AccountService accounts;
 
-    @Autowired
-    private TransactionService transactions;
+    private final TransactionService transactions;
 
     private UUID accountId;
 
