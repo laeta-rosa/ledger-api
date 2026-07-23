@@ -65,6 +65,20 @@ class AccountControllerTest extends AbstractControllerTest {
     }
 
     @Test
+    void surroundingWhitespaceIsTrimmed() {
+        var padded = new AccountRequest("   Jane", "Doe   ");
+
+        String accountId = rest.post("/accounts", padded)
+                .statusCode(201)
+                .body("name", equalTo("Jane"))
+                .body("surname", equalTo("Doe"))
+                .extract()
+                .path("id");
+
+        assertThat(db.accountOf(accountId)).isEqualTo(new AccountRow("Jane", "Doe", ZERO));
+    }
+
+    @Test
     void blankNameIsRejected() {
         rest.post("/accounts", AccountRequest.withName(""))
                 .statusCode(400);

@@ -32,7 +32,7 @@ public class Account {
     private Long version;
 
     public static Account open(String name, String surname) {
-        return new Account(UUID.randomUUID(), name, surname, new BigDecimal("0.00"), null);
+        return new Account(UUID.randomUUID(), name.strip(), surname.strip(), new BigDecimal("0.00"), null);
     }
 
     public void deposit(BigDecimal amount) {
