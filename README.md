@@ -1,5 +1,7 @@
 # Tiny Ledger API
 
+![Penguin counting money](readme-header.gif)
+
 A small REST API powering a simple ledger: record deposits and withdrawals, view the current balance, and view transaction history.
 
 Built with **Java 25** and **Spring Boot 4**, backed by an in-memory H2 database (via Spring Data JDBC) - nothing else to install, and all data is lost when the application stops.
