@@ -28,78 +28,60 @@ testing {
             dependencies {
                 implementation project()
                 implementation platform(SpringBootPlugin.BOM_COORDINATES)
-                annotationProcessor(libs.processor.lombok)
-                implementation(libs.processor.lombok)
-                implementation.bundle(libs.bundles.test)
+                implementation.bundle libs.bundles.test
             }
         }
 
         unit(JvmTestSuite) {
-            sources {
-                java {
-                    srcDir("src/test/unit/java")
-                }
-            }
+            sources.java.srcDir("src/test/unit/java")
             dependencies {
-                implementation(libs.spring.boot.starter.validation)
+                implementation libs.spring.boot.starter.validation
             }
         }
 
         architecture(JvmTestSuite) {
-            sources {
-                java {
-                    srcDir("src/test/architecture/java")
-                }
-            }
-            dependencies {
-                implementation(libs.test.archunit)
-            }
-            targets {
-                configureEach {
-                    testTask.configure {
-                        shouldRunAfter(testing.suites.unit)
-                    }
+            sources.java.srcDir("src/test/architecture/java")
+            targets.configureEach {
+                testTask.configure {
+                    shouldRunAfter(testing.suites.unit)
                 }
             }
         }
 
         integration(JvmTestSuite) {
             sources {
-                java {
-                    srcDir("src/test/integration/java")
-                }
-                resources {
-                    srcDir("src/test/integration/resources")
-                }
+                java.srcDir("src/test/integration/java")
+                resources.srcDir("src/test/integration/resources")
             }
             dependencies {
-                implementation(libs.database.starter.data.jdbc)
-                runtimeOnly(libs.database.h2)
+                implementation libs.database.starter.data.jdbc
+                runtimeOnly libs.database.h2
+                compileOnly libs.processor.lombok
+                annotationProcessor libs.processor.lombok
             }
-            targets {
-                configureEach {
-                    testTask.configure {
-                        shouldRunAfter(testing.suites.unit)
-                    }
+            targets.configureEach {
+                testTask.configure {
+                    shouldRunAfter(testing.suites.unit)
                 }
             }
         }
     }
+}
 
-    tasks.named("check") {
-        dependsOn(testing.suites.unit)
-        dependsOn(testing.suites.architecture)
-        dependsOn(testing.suites.integration)
-    }
+tasks.named('check') {
+    dependsOn(testing.suites)
 }
 
 dependencies {
     implementation platform(SpringBootPlugin.BOM_COORDINATES)
     implementation libs.bundles.spring
     implementation libs.jspecify
+
     runtimeOnly libs.database.h2
+
     compileOnly libs.processor.lombok
     annotationProcessor libs.processor.lombok
+
     errorprone libs.processor.errorprone
     errorprone libs.processor.nullaway
 }

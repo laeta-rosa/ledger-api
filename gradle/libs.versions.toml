@@ -43,5 +43,6 @@ spring = [
 
 test = [
     "test-spring-boot-starter-test",
-    "test-rest-assured"
+    "test-rest-assured",
+    "test-archunit"
 ]
