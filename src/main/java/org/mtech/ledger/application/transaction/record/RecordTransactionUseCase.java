@@ -2,12 +2,12 @@ package org.mtech.ledger.application.transaction.record;
 
 import java.math.RoundingMode;
 import java.time.Instant;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.mtech.ledger.adapter.outbound.repository.AccountRepository;
 import org.mtech.ledger.adapter.outbound.repository.TransactionRepository;
 import org.mtech.ledger.application.transaction.TransactionResult;
 import org.mtech.ledger.common.usecase.CommandUseCase;
+import org.mtech.ledger.common.uuid.UuidGenerator;
 import org.mtech.ledger.domain.account.AccountNotFoundException;
 import org.mtech.ledger.domain.transaction.Transaction;
 import org.springframework.stereotype.Service;
@@ -25,6 +25,7 @@ public class RecordTransactionUseCase implements CommandUseCase<RecordTransactio
 
     private final AccountRepository accounts;
     private final TransactionRepository transactions;
+    private final UuidGenerator uuidGenerator;
 
     @Override
     @Transactional
@@ -37,7 +38,7 @@ public class RecordTransactionUseCase implements CommandUseCase<RecordTransactio
         accounts.save(account);
 
         var transaction = new Transaction(
-                UUID.randomUUID(),
+                uuidGenerator.generate(),
                 command.accountId(),
                 command.type(),
                 normalized,

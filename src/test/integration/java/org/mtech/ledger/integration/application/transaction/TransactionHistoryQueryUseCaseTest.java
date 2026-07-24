@@ -2,6 +2,7 @@ package org.mtech.ledger.integration.application.transaction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mtech.ledger.integration.harness.FixedUuidGenerator.fixedUuid;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -17,6 +18,7 @@ import org.mtech.ledger.application.transaction.record.RecordTransactionCommand;
 import org.mtech.ledger.application.transaction.record.RecordTransactionUseCase;
 import org.mtech.ledger.domain.account.AccountNotFoundException;
 import org.mtech.ledger.domain.transaction.TransactionType;
+import org.mtech.ledger.integration.harness.FixedUuidGenerator;
 import org.mtech.ledger.integration.meta.IntegrationTest;
 
 @IntegrationTest
@@ -26,11 +28,13 @@ class TransactionHistoryQueryUseCaseTest {
     private final CreateAccountUseCase createAccount;
     private final RecordTransactionUseCase recordTransaction;
     private final TransactionHistoryQueryUseCase getTransactionHistory;
+    private final FixedUuidGenerator uuids;
 
     private UUID accountId;
 
     @BeforeEach
     void setUp() {
+        uuids.reset();
         accountId = createAccount.invoke(new CreateAccountCommand("Ada", "Lovelace")).id();
     }
 
@@ -42,10 +46,12 @@ class TransactionHistoryQueryUseCaseTest {
         var history = getTransactionHistory.invoke(new TransactionHistoryQuery(accountId));
 
         assertThat(history).hasSize(2);
-        assertThat(history.get(0).type()).isEqualTo(TransactionType.WITHDRAWAL);
-        assertThat(history.get(0).balanceAfter()).isEqualByComparingTo("60.00");
-        assertThat(history.get(1).type()).isEqualTo(TransactionType.DEPOSIT);
-        assertThat(history.get(1).balanceAfter()).isEqualByComparingTo("100.00");
+        assertThat(history.getFirst().id()).isEqualTo(fixedUuid(3));
+        assertThat(history.getFirst().type()).isEqualTo(TransactionType.WITHDRAWAL);
+        assertThat(history.getFirst().balanceAfter()).isEqualByComparingTo("60.00");
+        assertThat(history.getLast().id()).isEqualTo(fixedUuid(2));
+        assertThat(history.getLast().type()).isEqualTo(TransactionType.DEPOSIT);
+        assertThat(history.getLast().balanceAfter()).isEqualByComparingTo("100.00");
     }
 
     @Test

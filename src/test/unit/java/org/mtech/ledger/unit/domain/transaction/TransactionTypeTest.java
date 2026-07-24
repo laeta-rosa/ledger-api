@@ -4,6 +4,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
+import java.util.UUID;
 import org.junit.jupiter.api.Test;
 import org.mtech.ledger.domain.account.Account;
 import org.mtech.ledger.domain.account.InsufficientFundsException;
@@ -13,7 +14,7 @@ class TransactionTypeTest {
 
     @Test
     void depositAddsToBalance() {
-        var account = Account.open("Ada", "Lovelace");
+        var account = Account.open(UUID.randomUUID(), "Ada", "Lovelace");
 
         TransactionType.DEPOSIT.apply(account, new BigDecimal("40.00"));
 
@@ -22,7 +23,7 @@ class TransactionTypeTest {
 
     @Test
     void withdrawalSubtractsFromBalance() {
-        var account = Account.open("Ada", "Lovelace");
+        var account = Account.open(UUID.randomUUID(), "Ada", "Lovelace");
         TransactionType.DEPOSIT.apply(account, new BigDecimal("40.00"));
 
         TransactionType.WITHDRAWAL.apply(account, new BigDecimal("15.00"));
@@ -32,7 +33,7 @@ class TransactionTypeTest {
 
     @Test
     void withdrawalBeyondBalanceIsRejected() {
-        var account = Account.open("Ada", "Lovelace");
+        var account = Account.open(UUID.randomUUID(), "Ada", "Lovelace");
         TransactionType.DEPOSIT.apply(account, new BigDecimal("10.00"));
 
         assertThatThrownBy(() -> TransactionType.WITHDRAWAL.apply(account, new BigDecimal("15.00")))

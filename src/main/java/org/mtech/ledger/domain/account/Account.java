@@ -31,8 +31,8 @@ public class Account {
     @Version
     private Long version;
 
-    public static Account open(String name, String surname) {
-        return new Account(UUID.randomUUID(), name.strip(), surname.strip(), new BigDecimal("0.00"), null);
+    public static Account open(UUID id, String name, String surname) {
+        return new Account(id, name.strip(), surname.strip(), new BigDecimal("0.00"), null);
     }
 
     public void deposit(BigDecimal amount) {

@@ -26,7 +26,7 @@ class AccountRepositoryTest {
 
     @Test
     void concurrentModificationIsRejected() {
-        var accountId = accounts.save(Account.open("Ada", "Lovelace")).getId();
+        var accountId = accounts.save(Account.open(UUID.randomUUID(), "Ada", "Lovelace")).getId();
 
         // Two callers read the account at the same version.
         var first = accounts.findById(accountId).orElseThrow();

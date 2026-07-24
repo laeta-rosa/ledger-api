@@ -2,6 +2,7 @@ package org.mtech.ledger.integration.application.transaction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mtech.ledger.integration.harness.FixedUuidGenerator.fixedUuid;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -19,6 +20,7 @@ import org.mtech.ledger.application.transaction.TransactionResult;
 import org.mtech.ledger.domain.account.AccountNotFoundException;
 import org.mtech.ledger.domain.account.InsufficientFundsException;
 import org.mtech.ledger.domain.transaction.TransactionType;
+import org.mtech.ledger.integration.harness.FixedUuidGenerator;
 import org.mtech.ledger.integration.meta.IntegrationTest;
 
 @IntegrationTest
@@ -28,11 +30,13 @@ class RecordTransactionUseCaseTest {
     private final CreateAccountUseCase createAccount;
     private final RecordTransactionUseCase recordTransaction;
     private final AccountBalanceQueryUseCase getAccountBalance;
+    private final FixedUuidGenerator uuids;
 
     private UUID accountId;
 
     @BeforeEach
     void setUp() {
+        uuids.reset();
         accountId = createAccount.invoke(new CreateAccountCommand("Ada", "Lovelace")).id();
     }
 
@@ -40,6 +44,7 @@ class RecordTransactionUseCaseTest {
     void depositIncreasesBalance() {
         var tx = record(TransactionType.DEPOSIT, "100.50");
 
+        assertThat(tx.id()).isEqualTo(fixedUuid(2));
         assertThat(tx.balanceAfter()).isEqualByComparingTo("100.50");
         assertThat(balance()).isEqualByComparingTo("100.50");
     }

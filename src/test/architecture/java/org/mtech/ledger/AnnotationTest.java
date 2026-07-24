@@ -15,7 +15,7 @@ class AnnotationTest {
                 .that()
                 .areAnnotatedWith("org.springframework.context.annotation.Configuration")
                 .should()
-                .resideInAnyPackage("..configuration..", "..adapter..")
+                .resideInAnyPackage("..configuration..", "..adapter..", "..common..")
                 .allowEmptyShould(true)
                 .check(classes);
     }
