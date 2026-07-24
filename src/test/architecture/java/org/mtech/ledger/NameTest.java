@@ -40,6 +40,8 @@ class NameTest {
                 .resideInAPackage("..adapter.outbound.repository..")
                 .and()
                 .areInterfaces()
+                .and()
+                .doNotHaveSimpleName("package-info")
                 .should()
                 .haveSimpleNameEndingWith("Repository")
                 .allowEmptyShould(true)

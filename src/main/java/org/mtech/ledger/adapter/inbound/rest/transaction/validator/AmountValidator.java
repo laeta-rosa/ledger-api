@@ -3,6 +3,7 @@ package org.mtech.ledger.adapter.inbound.rest.transaction.validator;
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
 import java.math.BigDecimal;
+import org.jspecify.annotations.Nullable;
 
 /**
  * Enforces {@link ValidAmount}. Decimal places are counted after stripping
@@ -14,7 +15,7 @@ public class AmountValidator implements ConstraintValidator<ValidAmount, BigDeci
     private static final int MAX_FRACTION_DIGITS = 2;
 
     @Override
-    public boolean isValid(BigDecimal amount, ConstraintValidatorContext context) {
+    public boolean isValid(@Nullable BigDecimal amount, ConstraintValidatorContext context) {
         var message = violation(amount);
         if (message == null) {
             return true;
@@ -24,7 +25,7 @@ public class AmountValidator implements ConstraintValidator<ValidAmount, BigDeci
         return false;
     }
 
-    private String violation(BigDecimal amount) {
+    private @Nullable String violation(@Nullable BigDecimal amount) {
         if (amount == null) {
             return "must not be null";
         }

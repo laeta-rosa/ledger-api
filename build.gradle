@@ -1,8 +1,10 @@
+import net.ltgt.gradle.errorprone.CheckSeverity
 import org.springframework.boot.gradle.plugin.SpringBootPlugin
 
 plugins {
     id 'java'
     id 'jvm-test-suite'
+    alias(libs.plugins.errorprone)
     alias(libs.plugins.spring.boot)
 }
 
@@ -94,7 +96,19 @@ testing {
 dependencies {
     implementation platform(SpringBootPlugin.BOM_COORDINATES)
     implementation libs.bundles.spring
+    implementation libs.jspecify
     runtimeOnly libs.database.h2
     compileOnly libs.processor.lombok
     annotationProcessor libs.processor.lombok
+    errorprone libs.processor.errorprone
+    errorprone libs.processor.nullaway
+}
+
+tasks.withType(JavaCompile).configureEach {
+    options.errorprone {
+        disableAllChecks = true
+        check("NullAway", CheckSeverity.ERROR)
+        option("NullAway:OnlyNullMarked", "true")
+        option("NullAway:JSpecifyMode", "true")
+    }
 }

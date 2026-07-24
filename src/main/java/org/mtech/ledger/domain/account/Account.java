@@ -4,6 +4,7 @@ import java.math.BigDecimal;
 import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
+import org.jspecify.annotations.Nullable;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.annotation.Version;
 import org.springframework.data.relational.core.mapping.Table;
@@ -29,7 +30,7 @@ public class Account {
     private BigDecimal balance;
 
     @Version
-    private Long version;
+    private @Nullable Long version;
 
     public static Account open(UUID id, String name, String surname) {
         return new Account(id, name.strip(), surname.strip(), new BigDecimal("0.00"), null);

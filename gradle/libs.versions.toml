@@ -1,16 +1,26 @@
 [versions]
+plugin-errorprone = "5.1.0"
 plugin-spring-boot = "4.0.7"
 
 library-archunit = "1.4.1"
+library-errorprone = "2.50.0"
+library-jspecify = "1.0.0"
 library-lombok = "1.18.46"
+library-nullaway = "0.13.8"
 library-rest-assured = "6.0.1"
 library-springdoc = "3.0.3"
 
 [plugins]
+errorprone = { id = "net.ltgt.errorprone", version.ref = "plugin-errorprone" }
 spring-boot = { id = "org.springframework.boot", version.ref = "plugin-spring-boot" }
 
 [libraries]
 processor-lombok = { group = "org.projectlombok", name = "lombok", version.ref = "library-lombok" }
+
+jspecify = { group = "org.jspecify", name = "jspecify", version.ref = "library-jspecify" }
+
+processor-errorprone = { group = "com.google.errorprone", name = "error_prone_core", version.ref = "library-errorprone" }
+processor-nullaway = { group = "com.uber.nullaway", name = "nullaway", version.ref = "library-nullaway" }
 
 database-starter-data-jdbc = { group = "org.springframework.boot", name = "spring-boot-starter-data-jdbc" }
 database-h2 = { group = "com.h2database", name = "h2" }
