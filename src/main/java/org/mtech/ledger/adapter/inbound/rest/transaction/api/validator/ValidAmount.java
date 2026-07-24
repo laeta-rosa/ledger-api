@@ -1,4 +1,4 @@
-package org.mtech.ledger.adapter.inbound.rest.transaction.validator;
+package org.mtech.ledger.adapter.inbound.rest.transaction.api.validator;
 
 import static java.lang.annotation.ElementType.ANNOTATION_TYPE;
 import static java.lang.annotation.ElementType.CONSTRUCTOR;

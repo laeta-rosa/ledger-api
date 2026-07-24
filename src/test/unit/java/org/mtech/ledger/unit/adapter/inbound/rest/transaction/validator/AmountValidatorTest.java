@@ -13,7 +13,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.ValueSource;
-import org.mtech.ledger.adapter.inbound.rest.transaction.CreateTransactionRequest;
+import org.mtech.ledger.adapter.inbound.rest.transaction.api.CreateTransactionRequest;
 
 class AmountValidatorTest {
 

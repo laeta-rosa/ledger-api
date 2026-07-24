@@ -1,4 +1,4 @@
-package org.mtech.ledger.adapter.inbound.rest.transaction;
+package org.mtech.ledger.adapter.inbound.rest.transaction.api;
 
 import java.math.BigDecimal;
 import java.time.Instant;

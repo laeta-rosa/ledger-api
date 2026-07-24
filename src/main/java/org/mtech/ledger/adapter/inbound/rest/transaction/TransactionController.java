@@ -5,6 +5,8 @@ import jakarta.validation.Valid;
 import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.mtech.ledger.adapter.inbound.rest.transaction.api.CreateTransactionRequest;
+import org.mtech.ledger.adapter.inbound.rest.transaction.api.TransactionResponse;
 import org.mtech.ledger.application.transaction.historyquery.TransactionHistoryQuery;
 import org.mtech.ledger.application.transaction.historyquery.TransactionHistoryQueryUseCase;
 import org.mtech.ledger.application.transaction.record.RecordTransactionCommand;

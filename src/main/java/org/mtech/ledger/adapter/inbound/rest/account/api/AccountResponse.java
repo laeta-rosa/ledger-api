@@ -1,4 +1,4 @@
-package org.mtech.ledger.adapter.inbound.rest.account;
+package org.mtech.ledger.adapter.inbound.rest.account.api;
 
 import java.math.BigDecimal;
 import java.util.UUID;

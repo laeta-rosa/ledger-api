@@ -10,6 +10,7 @@ import java.lang.annotation.Retention;
 import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 import lombok.experimental.UtilityClass;
+import org.mtech.ledger.adapter.inbound.rest.account.api.AccountResponse;
 import org.springframework.http.ProblemDetail;
 
 /** OpenAPI documentation for {@link AccountController}. */

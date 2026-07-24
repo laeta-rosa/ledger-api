@@ -1,4 +1,4 @@
-package org.mtech.ledger.adapter.inbound.rest.account;
+package org.mtech.ledger.adapter.inbound.rest.account.api;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;

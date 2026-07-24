@@ -89,8 +89,10 @@ dependencies {
 tasks.withType(JavaCompile).configureEach {
     options.errorprone {
         disableAllChecks = true
-        check("NullAway", CheckSeverity.ERROR)
-        option("NullAway:OnlyNullMarked", "true")
-        option("NullAway:JSpecifyMode", "true")
+        if (name == 'compileJava') {
+            check("NullAway", CheckSeverity.ERROR)
+            option("NullAway:AnnotatedPackages", "org.mtech")
+            option("NullAway:JSpecifyMode", "true")
+        }
     }
 }

@@ -1,4 +1,4 @@
-package org.mtech.ledger.adapter.inbound.rest.transaction.validator;
+package org.mtech.ledger.adapter.inbound.rest.transaction.api.validator;
 
 import jakarta.validation.ConstraintValidator;
 import jakarta.validation.ConstraintValidatorContext;
