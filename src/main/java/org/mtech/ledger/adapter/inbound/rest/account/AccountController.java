@@ -10,6 +10,10 @@ import org.mtech.ledger.application.account.create.CreateAccountCommand;
 import org.mtech.ledger.application.account.create.CreateAccountUseCase;
 import org.mtech.ledger.application.account.balancequery.AccountBalanceQuery;
 import org.mtech.ledger.application.account.balancequery.AccountBalanceQueryUseCase;
+import org.mtech.ledger.application.account.AccountResult.NotFound;
+import org.mtech.ledger.application.account.AccountResult.Success;
+import org.mtech.ledger.domain.account.AccountNotFoundException;
+import org.mtech.ledger.domain.vo.AccountId;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -39,6 +43,10 @@ public class AccountController {
     @GetMapping("/{id}/balance")
     @Swagger.GetBalance.Description
     public AccountResponse getBalance(@PathVariable UUID id) {
-        return AccountResponse.from(getAccountBalance.invoke(new AccountBalanceQuery(id)));
+        var result = getAccountBalance.invoke(new AccountBalanceQuery(AccountId.of(id)));
+        return switch (result) {
+            case Success found -> AccountResponse.from(found);
+            case NotFound notFound -> throw new AccountNotFoundException(notFound.id());
+        };
     }
 }

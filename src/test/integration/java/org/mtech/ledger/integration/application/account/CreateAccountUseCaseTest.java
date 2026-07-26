@@ -6,10 +6,13 @@ import static org.mtech.ledger.integration.harness.FixedUuidGenerator.fixedUuid;
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mtech.ledger.application.account.AccountResult;
 import org.mtech.ledger.application.account.create.CreateAccountCommand;
 import org.mtech.ledger.application.account.create.CreateAccountUseCase;
 import org.mtech.ledger.application.account.balancequery.AccountBalanceQuery;
 import org.mtech.ledger.application.account.balancequery.AccountBalanceQueryUseCase;
+import org.mtech.ledger.domain.vo.AccountId;
+import org.mtech.ledger.domain.vo.Money;
 import org.mtech.ledger.integration.harness.FixedUuidGenerator;
 import org.mtech.ledger.integration.meta.IntegrationTest;
 
@@ -30,11 +33,11 @@ class CreateAccountUseCaseTest {
     void newAccountStartsWithZeroBalance() {
         var created = createAccount.invoke(new CreateAccountCommand("Ada", "Lovelace"));
 
-        assertThat(created.id()).isEqualTo(fixedUuid(1));
-        assertThat(created.balance()).isEqualByComparingTo("0.00");
+        assertThat(created.id()).isEqualTo(AccountId.of(fixedUuid(1)));
+        assertThat(created.balance()).isEqualTo(Money.ZERO);
 
-        var balance = getAccountBalance.invoke(new AccountBalanceQuery(created.id()));
-        assertThat(balance.balance()).isEqualByComparingTo("0.00");
+        var balance = (AccountResult.Success) getAccountBalance.invoke(new AccountBalanceQuery(created.id()));
+        assertThat(balance.balance()).isEqualTo(Money.ZERO);
         assertThat(balance.name()).isEqualTo("Ada");
         assertThat(balance.surname()).isEqualTo("Lovelace");
     }

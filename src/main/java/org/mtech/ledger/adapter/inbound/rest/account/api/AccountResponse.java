@@ -6,7 +6,8 @@ import org.mtech.ledger.application.account.AccountResult;
 
 public record AccountResponse(UUID id, String name, String surname, BigDecimal balance) {
 
-    public static AccountResponse from(AccountResult account) {
-        return new AccountResponse(account.id(), account.name(), account.surname(), account.balance());
+    public static AccountResponse from(AccountResult.Success account) {
+        return new AccountResponse(
+                account.id().value(), account.name(), account.surname(), account.balance().value());
     }
 }

@@ -1,15 +1,17 @@
 package org.mtech.ledger.application.transaction.record;
 
-import java.math.RoundingMode;
 import java.time.Instant;
 import lombok.RequiredArgsConstructor;
 import org.mtech.ledger.adapter.outbound.repository.AccountRepository;
 import org.mtech.ledger.adapter.outbound.repository.TransactionRepository;
 import org.mtech.ledger.application.transaction.TransactionResult;
+import org.mtech.ledger.application.transaction.TransactionResult.AccountNotFound;
+import org.mtech.ledger.application.transaction.TransactionResult.Success;
 import org.mtech.ledger.common.usecase.CommandUseCase;
 import org.mtech.ledger.common.uuid.UuidGenerator;
-import org.mtech.ledger.domain.account.AccountNotFoundException;
+import org.mtech.ledger.domain.account.Account;
 import org.mtech.ledger.domain.transaction.Transaction;
+import org.mtech.ledger.domain.vo.TransactionId;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,26 +26,28 @@ import org.springframework.transaction.annotation.Transactional;
 public class RecordTransactionUseCase implements CommandUseCase<RecordTransactionCommand, TransactionResult> {
 
     private final AccountRepository accounts;
-    private final TransactionRepository transactions;
     private final UuidGenerator uuidGenerator;
+    private final TransactionRepository transactions;
 
     @Override
     @Transactional
     public TransactionResult invoke(RecordTransactionCommand command) {
-        var account = accounts.findById(command.accountId())
-                .orElseThrow(() -> new AccountNotFoundException(command.accountId()));
-        var normalized = command.amount().setScale(2, RoundingMode.UNNECESSARY);
+        return accounts.findById(command.accountId())
+                .<TransactionResult>map(account -> record(account, command))
+                .orElseGet(() -> new AccountNotFound(command.accountId()));
+    }
 
-        command.type().apply(account, normalized);
+    private Success record(Account account, RecordTransactionCommand command) {
+        command.type().apply(account, command.amount());
         accounts.save(account);
 
         var transaction = new Transaction(
-                uuidGenerator.generate(),
-                command.accountId(),
+                TransactionId.of(uuidGenerator.generate()),
+                account.getId(),
                 command.type(),
-                normalized,
+                command.amount(),
                 Instant.now(),
                 account.getBalance());
-        return TransactionResult.from(transactions.save(transaction));
+        return Success.of(transactions.save(transaction));
     }
 }

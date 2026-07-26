@@ -3,13 +3,14 @@ package org.mtech.ledger.integration.adapter.outbound.repository;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
-import java.math.BigDecimal;
 import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.Test;
 import org.mtech.ledger.adapter.outbound.repository.AccountRepository;
 import org.mtech.ledger.domain.account.Account;
+import org.mtech.ledger.domain.vo.AccountId;
+import org.mtech.ledger.domain.vo.Money;
 import org.mtech.ledger.integration.meta.IntegrationTest;
 import org.springframework.dao.OptimisticLockingFailureException;
 
@@ -26,22 +27,23 @@ class AccountRepositoryTest {
 
     @Test
     void concurrentModificationIsRejected() {
-        var accountId = accounts.save(Account.open(UUID.randomUUID(), "Ada", "Lovelace")).getId();
+        var accountId = accounts.save(
+                Account.open(AccountId.of(UUID.randomUUID()), "Ada", "Lovelace")).getId();
 
         // Two callers read the account at the same version.
         var first = accounts.findById(accountId).orElseThrow();
         var second = accounts.findById(accountId).orElseThrow();
 
         // The first write wins and bumps the version.
-        first.deposit(new BigDecimal("100.00"));
+        first.deposit(Money.of("100.00"));
         accounts.save(first);
 
         // The second write is now stale: the optimistic lock must reject it.
-        second.deposit(new BigDecimal("50.00"));
+        second.deposit(Money.of("50.00"));
         assertThatThrownBy(() -> accounts.save(second))
                 .isInstanceOf(OptimisticLockingFailureException.class);
 
         assertThat(accounts.findById(accountId).orElseThrow().getBalance())
-                .isEqualByComparingTo("100.00");
+                .isEqualTo(Money.of("100.00"));
     }
 }

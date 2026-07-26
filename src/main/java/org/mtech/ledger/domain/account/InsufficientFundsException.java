@@ -1,10 +1,10 @@
 package org.mtech.ledger.domain.account;
 
-import java.math.BigDecimal;
+import org.mtech.ledger.domain.vo.Money;
 
 public class InsufficientFundsException extends RuntimeException {
 
-    public InsufficientFundsException(BigDecimal balance, BigDecimal requested) {
+    public InsufficientFundsException(Money balance, Money requested) {
         super("Insufficient funds: balance is " + balance + ", requested withdrawal of " + requested);
     }
 }

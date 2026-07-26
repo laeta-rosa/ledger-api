@@ -76,9 +76,12 @@ class StructureTest {
                 .haveSimpleNameEndingWith("Result")
                 .should()
                 .beRecords()
+                .orShould()
+                .beInterfaces()
                 .because("""
                 a *Result is an immutable output of a use case that decouples adapters from the domain \
-                aggregate, so a record keeps it a pure data carrier with value semantics and immutability.""")
+                aggregate: either a record (a pure data carrier with value semantics and immutability) or \
+                a sealed interface over such records, so callers must handle every outcome exhaustively.""")
                 .allowEmptyShould(true)
                 .check(classes);
     }

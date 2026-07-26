@@ -1,50 +1,41 @@
 package org.mtech.ledger.domain.account;
 
-import java.math.BigDecimal;
-import java.util.UUID;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.jspecify.annotations.Nullable;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.annotation.Version;
-import org.springframework.data.relational.core.mapping.Table;
+import org.mtech.ledger.domain.vo.AccountId;
+import org.mtech.ledger.domain.vo.Money;
 
 /**
  * Aggregate root for a ledger account. The current balance is the single
  * invariant this aggregate protects, so the balance-changing rules live here.
- * The {@code version} field drives optimistic locking and lets Spring Data JDBC
- * distinguish a freshly opened account (null version) from a persisted one.
  */
-@Table("account")
 @Getter
 @AllArgsConstructor
 public class Account {
 
-    @Id
-    private final UUID id;
+    private final AccountId id;
 
     private final String name;
 
     private final String surname;
 
-    private BigDecimal balance;
+    private Money balance;
 
-    @Version
-    private @Nullable Long version;
+    private final @Nullable Long version;
 
-    public static Account open(UUID id, String name, String surname) {
-        return new Account(id, name.strip(), surname.strip(), new BigDecimal("0.00"), null);
+    public static Account open(AccountId id, String name, String surname) {
+        return new Account(id, name.strip(), surname.strip(), Money.ZERO, null);
     }
 
-    public void deposit(BigDecimal amount) {
-        this.balance = this.balance.add(amount);
+    public void deposit(Money amount) {
+        this.balance = this.balance.add(amount.requirePositive());
     }
 
-    public void withdraw(BigDecimal amount) {
-        var newBalance = this.balance.subtract(amount);
-        if (newBalance.signum() < 0) {
+    public void withdraw(Money amount) {
+        if (amount.requirePositive().isGreaterThan(this.balance)) {
             throw new InsufficientFundsException(this.balance, amount);
         }
-        this.balance = newBalance;
+        this.balance = this.balance.subtract(amount);
     }
 }

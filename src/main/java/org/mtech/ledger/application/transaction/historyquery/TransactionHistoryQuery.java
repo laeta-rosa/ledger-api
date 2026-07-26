@@ -1,7 +1,7 @@
 package org.mtech.ledger.application.transaction.historyquery;
 
-import java.util.UUID;
+import org.mtech.ledger.domain.vo.AccountId;
 
 /** Request for an account's transaction history. */
-public record TransactionHistoryQuery(UUID accountId) {
+public record TransactionHistoryQuery(AccountId accountId) {
 }

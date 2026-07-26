@@ -1,34 +1,20 @@
 package org.mtech.ledger.domain.transaction;
 
-import java.math.BigDecimal;
 import java.time.Instant;
-import java.util.UUID;
-import org.springframework.data.annotation.Id;
-import org.springframework.data.domain.Persistable;
-import org.springframework.data.relational.core.mapping.Table;
+import org.mtech.ledger.domain.vo.AccountId;
+import org.mtech.ledger.domain.vo.Money;
+import org.mtech.ledger.domain.vo.TransactionId;
 
 /**
- * A single money movement, stored in its own table and referencing the owning
- * account by id. The ledger is append-only — transactions are never updated —
- * so {@link #isNew()} always returns {@code true}, telling Spring Data JDBC to
- * INSERT even though the id is assigned by us rather than the database.
+ * A single money movement in the append-only ledger, referencing the owning
+ * account by id. Each transaction stores the resulting balance
+ * ({@code balanceAfter}), so history doubles as an audit trail.
  */
-@Table("account_transaction")
 public record Transaction(
-        @Id UUID id,
-        UUID accountId,
+        TransactionId id,
+        AccountId accountId,
         TransactionType type,
-        BigDecimal amount,
+        Money amount,
         Instant timestamp,
-        BigDecimal balanceAfter) implements Persistable<UUID> {
-
-    @Override
-    public UUID getId() {
-        return id;
-    }
-
-    @Override
-    public boolean isNew() {
-        return true;
-    }
+        Money balanceAfter) {
 }
