@@ -1,6 +1,6 @@
 package org.mtech.ledger.application.transaction.record;
 
-import java.time.Instant;
+import java.time.Clock;
 import lombok.RequiredArgsConstructor;
 import org.mtech.ledger.adapter.outbound.repository.AccountRepository;
 import org.mtech.ledger.adapter.outbound.repository.TransactionRepository;
@@ -25,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class RecordTransactionUseCase implements CommandUseCase<RecordTransactionCommand, TransactionResult> {
 
+    private final Clock clock;
     private final AccountRepository accounts;
     private final UuidGenerator uuidGenerator;
     private final TransactionRepository transactions;
@@ -46,7 +47,7 @@ public class RecordTransactionUseCase implements CommandUseCase<RecordTransactio
                 account.getId(),
                 command.type(),
                 command.amount(),
-                Instant.now(),
+                clock.instant(),
                 account.getBalance());
         return Success.of(transactions.save(transaction));
     }

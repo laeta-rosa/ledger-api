@@ -2,6 +2,7 @@ package org.mtech.ledger.integration.application.transaction;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
+import static org.mtech.ledger.integration.harness.FixedClockConfiguration.FIXED_INSTANT;
 import static org.mtech.ledger.integration.harness.FixedUuidGenerator.fixedUuid;
 
 import java.util.UUID;
@@ -31,10 +32,10 @@ import org.mtech.ledger.integration.meta.IntegrationTest;
 @RequiredArgsConstructor
 class RecordTransactionUseCaseTest {
 
+    private final FixedUuidGenerator uuids;
     private final CreateAccountUseCase createAccount;
     private final RecordTransactionUseCase recordTransaction;
     private final AccountBalanceQueryUseCase getAccountBalance;
-    private final FixedUuidGenerator uuids;
 
     private AccountId accountId;
 
@@ -49,6 +50,7 @@ class RecordTransactionUseCaseTest {
         var tx = record(TransactionType.DEPOSIT, "100.50");
 
         assertThat(tx.id()).isEqualTo(TransactionId.of(fixedUuid(2)));
+        assertThat(tx.timestamp()).isEqualTo(FIXED_INSTANT);
         assertThat(tx.balanceAfter()).isEqualTo(Money.of("100.50"));
         assertThat(balance()).isEqualTo(Money.of("100.50"));
     }

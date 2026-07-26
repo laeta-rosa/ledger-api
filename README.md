@@ -70,7 +70,7 @@ Check the balance:
 
 ```bash
 curl -s localhost:8080/accounts/<id>/balance
-# {"id":"...","balance":70.00}
+# {"id":"...","name":"Jane","surname":"Doe","balance":70.00}
 ```
 
 View transaction history (newest first):
@@ -90,15 +90,16 @@ Errors are returned as RFC 9457 `application/problem+json` bodies:
 
 ## Design
 
-Lightweight hexagonal architecture - the ports-and-adapters shape without the
-ceremony. There are no per-use-case port interfaces and each use case has a
-single concrete implementation, so nothing is abstracted "just in case."
+The application follows a pragmatic hexagonal (ports-and-adapters) architecture:
+the dependency direction and layer boundaries are enforced, but incidental
+abstraction is avoided. Since each use case has exactly one implementation,
+no per-use-case port interfaces are introduced.
 
 - `adapter/inbound/rest/` - REST controllers, request/response records, bean-validation for amounts, and an exception handler mapping domain errors to RFC 9457 problem-detail responses. Controllers translate HTTP into use-case commands/queries and back.
 - `application/` - the use cases, one package per use case. Each is a command use case (`CreateAccountUseCase`, `RecordTransactionUseCase`) or a query use case (`AccountBalanceQueryUseCase`, `TransactionHistoryQueryUseCase`). It takes a `*Command`/`*Query` and returns a `*Result`; the use cases orchestrate the domain and repositories, while the business rules themselves live in the domain.
 - `adapter/outbound/repository/` - the outbound persistence adapters. Each repository speaks the domain language outward (`Account`, `AccountId`, `Transaction`) and maps to persistence rows in `entity/` through a Spring Data JDBC repository in `crud/` underneath.
 - `domain/` - split into `account/` (the `Account` aggregate and domain exceptions), `transaction/` (the immutable `Transaction` record and `TransactionType`), and `vo/` (the `AccountId`, `TransactionId`, and `Money` value objects). `Money` rejects negative amounts and more than 2 decimal places at construction and normalizes to scale 2, so no invalid amount can exist anywhere in the domain; `Account` enforces that deposits/withdrawals are positive and that withdrawals cannot overdraw. Each recorded transaction stores the resulting balance (`balanceAfter`), so history doubles as an audit trail.
-- `common/` - the `CommandUseCase`/`QueryUseCase` contracts and an injectable `UuidGenerator` so id creation is testable.
+- `common/` - the `CommandUseCase`/`QueryUseCase` contracts, plus an injectable `UuidGenerator` and `Clock` so id creation and timestamps are testable.
 
 Null safety is enforced at compile time with NullAway in JSpecify mode - the whole codebase is `@NullMarked`.
 
