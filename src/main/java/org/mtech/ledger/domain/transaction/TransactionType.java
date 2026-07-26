@@ -1,9 +1,8 @@
 package org.mtech.ledger.domain.transaction;
 
-import java.math.BigDecimal;
-
 import lombok.AllArgsConstructor;
 import org.mtech.ledger.domain.account.Account;
+import org.mtech.ledger.domain.vo.Money;
 
 @AllArgsConstructor
 public enum TransactionType {
@@ -12,7 +11,7 @@ public enum TransactionType {
 
     private final BalanceOperation action;
 
-    public void apply(Account account, BigDecimal amount) {
+    public void apply(Account account, Money amount) {
         this.action.accept(account, amount);
     }
 }

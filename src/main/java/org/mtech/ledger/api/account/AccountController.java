@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.mtech.ledger.domain.vo.AccountId;
 import org.mtech.ledger.service.AccountService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,6 +34,7 @@ public class AccountController {
     @GetMapping("/{id}/balance")
     @Swagger.GetBalance.Description
     public AccountResponse getBalance(@PathVariable UUID id) {
-        return AccountResponse.from(accounts.getAccount(id));
+        var account = accounts.getAccount(AccountId.of(id));
+        return AccountResponse.from(account);
     }
 }

@@ -4,13 +4,14 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatThrownBy;
 
 import java.math.BigDecimal;
-import java.util.UUID;
 
 import lombok.RequiredArgsConstructor;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.mtech.ledger.domain.vo.AccountId;
 import org.mtech.ledger.domain.account.AccountNotFoundException;
 import org.mtech.ledger.domain.account.InsufficientFundsException;
+import org.mtech.ledger.domain.vo.Money;
 import org.mtech.ledger.domain.transaction.TransactionType;
 import org.mtech.ledger.meta.IntegrationTest;
 
@@ -22,7 +23,7 @@ class TransactionServiceTest {
 
     private final TransactionService transactions;
 
-    private UUID accountId;
+    private AccountId accountId;
 
     @BeforeEach
     void setUp() {
@@ -33,8 +34,8 @@ class TransactionServiceTest {
     void depositIncreasesBalance() {
         var tx = transactions.record(accountId, TransactionType.DEPOSIT, new BigDecimal("100.50"));
 
-        assertThat(tx.balanceAfter()).isEqualByComparingTo("100.50");
-        assertThat(accounts.getBalance(accountId)).isEqualByComparingTo("100.50");
+        assertThat(tx.balanceAfter()).isEqualTo(Money.of("100.50"));
+        assertThat(accounts.getBalance(accountId)).isEqualTo(Money.of("100.50"));
     }
 
     @Test
@@ -42,7 +43,15 @@ class TransactionServiceTest {
         transactions.record(accountId, TransactionType.DEPOSIT, new BigDecimal("100.00"));
         transactions.record(accountId, TransactionType.WITHDRAWAL, new BigDecimal("30.00"));
 
-        assertThat(accounts.getBalance(accountId)).isEqualByComparingTo("70.00");
+        assertThat(accounts.getBalance(accountId)).isEqualTo(Money.of("70.00"));
+    }
+
+    @Test
+    void amountIsNormalizedToScaleTwo() {
+        var tx = transactions.record(accountId, TransactionType.DEPOSIT, new BigDecimal("5.500"));
+
+        assertThat(tx.amount()).isEqualTo(Money.of("5.50"));
+        assertThat(accounts.getBalance(accountId)).isEqualTo(Money.of("5.50"));
     }
 
     @Test
@@ -52,12 +61,23 @@ class TransactionServiceTest {
         assertThatThrownBy(() ->
                 transactions.record(accountId, TransactionType.WITHDRAWAL, new BigDecimal("10.01")))
                 .isInstanceOf(InsufficientFundsException.class);
-        assertThat(accounts.getBalance(accountId)).isEqualByComparingTo("10.00");
+        assertThat(accounts.getBalance(accountId)).isEqualTo(Money.of("10.00"));
+    }
+
+    @Test
+    void invalidAmountIsRejectedEvenWithoutBoundaryValidation() {
+        assertThatThrownBy(() ->
+                transactions.record(accountId, TransactionType.DEPOSIT, new BigDecimal("1.005")))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThatThrownBy(() ->
+                transactions.record(accountId, TransactionType.DEPOSIT, new BigDecimal("-1.00")))
+                .isInstanceOf(IllegalArgumentException.class);
+        assertThat(accounts.getBalance(accountId)).isEqualTo(Money.ZERO);
     }
 
     @Test
     void unknownAccountIsRejected() {
-        var unknown = UUID.randomUUID();
+        var unknown = AccountId.random();
 
         assertThatThrownBy(() ->
                 transactions.record(unknown, TransactionType.DEPOSIT, new BigDecimal("1.00")))
@@ -75,9 +95,9 @@ class TransactionServiceTest {
 
         assertThat(history).hasSize(2);
         assertThat(history.get(0).type()).isEqualTo(TransactionType.WITHDRAWAL);
-        assertThat(history.get(0).balanceAfter()).isEqualByComparingTo("60.00");
+        assertThat(history.get(0).balanceAfter()).isEqualTo(Money.of("60.00"));
         assertThat(history.get(1).type()).isEqualTo(TransactionType.DEPOSIT);
-        assertThat(history.get(1).balanceAfter()).isEqualByComparingTo("100.00");
+        assertThat(history.get(1).balanceAfter()).isEqualTo(Money.of("100.00"));
     }
 
     @Test

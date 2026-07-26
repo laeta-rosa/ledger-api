@@ -15,10 +15,10 @@ public record TransactionResponse(
 
     public static TransactionResponse from(Transaction transaction) {
         return new TransactionResponse(
-                transaction.id(),
+                transaction.id().value(),
                 transaction.type(),
-                transaction.amount(),
+                transaction.amount().value(),
                 transaction.timestamp(),
-                transaction.balanceAfter());
+                transaction.balanceAfter().value());
     }
 }

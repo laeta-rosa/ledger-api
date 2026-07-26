@@ -8,6 +8,6 @@ public record AccountResponse(UUID id, String name, String surname, BigDecimal b
 
     public static AccountResponse from(Account account) {
         return new AccountResponse(
-                account.getId(), account.getName(), account.getSurname(), account.getBalance());
+                account.getId().value(), account.getName(), account.getSurname(), account.getBalance().value());
     }
 }

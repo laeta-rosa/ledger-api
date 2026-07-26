@@ -1,12 +1,13 @@
 package org.mtech.ledger.service;
 
 import java.math.BigDecimal;
-import java.math.RoundingMode;
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
+import org.mtech.ledger.domain.vo.AccountId;
+import org.mtech.ledger.domain.vo.Money;
 import org.mtech.ledger.domain.transaction.Transaction;
+import org.mtech.ledger.domain.vo.TransactionId;
 import org.mtech.ledger.domain.transaction.TransactionType;
 import org.mtech.ledger.repository.TransactionRepository;
 import org.springframework.stereotype.Service;
@@ -27,23 +28,22 @@ public class TransactionService {
      * overdraft can never slip through a race.
      */
     @Transactional
-    public Transaction record(UUID accountId, TransactionType transactionType, BigDecimal amount) {
+    public Transaction record(AccountId accountId, TransactionType transactionType, BigDecimal amount) {
         var account = accounts.getAccount(accountId);
-        var normalized = amount.setScale(2, RoundingMode.UNNECESSARY);
+        var money = Money.of(amount);
 
-        transactionType.apply(account, normalized);
+        transactionType.apply(account, money);
 
         accounts.save(account);
 
         var transaction = new Transaction(
-                UUID.randomUUID(), accountId, transactionType, normalized, Instant.now(), account.getBalance());
+                TransactionId.random(), accountId, transactionType, money, Instant.now(), account.getBalance());
         return transactions.save(transaction);
     }
 
-    /** Returns the account's transactions, newest first. */
     @Transactional(readOnly = true)
-    public List<Transaction> getHistory(UUID accountId) {
+    public List<Transaction> getHistory(AccountId accountId) {
         accounts.getAccount(accountId);
-        return transactions.findByAccountIdOrderByTimestampDescIdDesc(accountId);
+        return transactions.findByAccountIdNewestFirst(accountId);
     }
 }

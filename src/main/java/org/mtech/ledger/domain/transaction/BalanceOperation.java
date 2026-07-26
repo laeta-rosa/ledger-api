@@ -1,15 +1,13 @@
 package org.mtech.ledger.domain.transaction;
 
-import java.math.BigDecimal;
 import java.util.function.BiConsumer;
 import org.mtech.ledger.domain.account.Account;
+import org.mtech.ledger.domain.vo.Money;
 
 /**
  * A balance-changing operation applied to an account, such as
- * {@link Account#deposit} or {@link Account#withdraw}. Naming the contract keeps
- * the intent explicit where a bare {@code BiConsumer<Account, BigDecimal>} would read as
- * "some function."
+ * {@link Account#deposit} or {@link Account#withdraw}.
  */
 @FunctionalInterface
-public interface BalanceOperation extends BiConsumer<Account, BigDecimal> {
+public interface BalanceOperation extends BiConsumer<Account, Money> {
 }

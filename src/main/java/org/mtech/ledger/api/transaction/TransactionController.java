@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.mtech.ledger.domain.transaction.TransactionType;
+import org.mtech.ledger.domain.vo.AccountId;
 import org.mtech.ledger.service.TransactionService;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,7 +28,7 @@ public class TransactionController {
     @GetMapping("/transactions")
     @Swagger.GetHistory.Description
     public List<TransactionResponse> getHistory(@PathVariable UUID id) {
-        return transactions.getHistory(id).stream().map(TransactionResponse::from).toList();
+        return transactions.getHistory(AccountId.of(id)).stream().map(TransactionResponse::from).toList();
     }
 
     @PostMapping("/deposit")
@@ -35,7 +36,7 @@ public class TransactionController {
     @Swagger.Deposit.Description
     public TransactionResponse deposit(
             @PathVariable UUID id, @Valid @RequestBody CreateTransactionRequest request) {
-        var transaction = transactions.record(id, TransactionType.DEPOSIT, request.amount());
+        var transaction = transactions.record(AccountId.of(id), TransactionType.DEPOSIT, request.amount());
         return TransactionResponse.from(transaction);
     }
 
@@ -44,7 +45,7 @@ public class TransactionController {
     @Swagger.Withdraw.Description
     public TransactionResponse withdraw(
             @PathVariable UUID id, @Valid @RequestBody CreateTransactionRequest request) {
-        var transaction = transactions.record(id, TransactionType.WITHDRAWAL, request.amount());
+        var transaction = transactions.record(AccountId.of(id), TransactionType.WITHDRAWAL, request.amount());
         return TransactionResponse.from(transaction);
     }
 }

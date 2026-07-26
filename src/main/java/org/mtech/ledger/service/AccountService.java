@@ -1,10 +1,10 @@
 package org.mtech.ledger.service;
 
-import java.math.BigDecimal;
-import java.util.UUID;
 import lombok.RequiredArgsConstructor;
 import org.mtech.ledger.domain.account.Account;
+import org.mtech.ledger.domain.vo.AccountId;
 import org.mtech.ledger.domain.account.AccountNotFoundException;
+import org.mtech.ledger.domain.vo.Money;
 import org.mtech.ledger.repository.AccountRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,18 +19,16 @@ public class AccountService {
         return accounts.save(Account.open(name, surname));
     }
 
-    public BigDecimal getBalance(UUID accountId) {
+    public Money getBalance(AccountId accountId) {
         return getAccount(accountId).getBalance();
     }
 
-    /** Loads an account or throws {@link AccountNotFoundException}. */
-    public Account getAccount(UUID accountId) {
+    public Account getAccount(AccountId accountId) {
         return accounts.findById(accountId)
                 .orElseThrow(() -> new AccountNotFoundException(accountId));
     }
 
-    /** Persists balance/version changes made to an account. */
-    public Account save(Account account) {
-        return accounts.save(account);
+    public void save(Account account) {
+        accounts.save(account);
     }
 }
